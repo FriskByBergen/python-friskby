@@ -1,11 +1,13 @@
+#!/usr/bin/env python
+from __future__ import print_function
+
 import sys
 import time
 from datetime import datetime as dt
 
-from ts import TS
-from friskby_dao import FriskbyDao
+from friskby import FriskbyDao, TS
 
-class Sampler(object):
+class FbySampler(object):
     """This class is initialized with a reader (a sensor of type SDS011), a dao and
     sample time.  The collect method collects data for `sample_time` amount of
     time, and then asks the FriskbyDao to persist this data.
@@ -46,9 +48,9 @@ class Sampler(object):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        dao = FriskbyDao(sys.argv[1])
-        from sds011 import SDS011
-        sam = Sampler(SDS011(True), dao, 10) # 10 sec
-        sam.collect()
+        DAO = FriskbyDao(sys.argv[1])
+        from friskby import SDS011
+        SAM = FbySampler(SDS011(True), DAO, 10) # 10 sec
+        SAM.collect()
     else:
         sys.stderr.write('Please specify database file.\n')
