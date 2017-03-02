@@ -15,12 +15,14 @@ try:
     from sds011 import SDS011
 except ImportError as err:
     import sys
-    sys.stderr.write('Missing SDS011 library!"%s"!\nUsing mock library.\n' % str(err))
+    sys.stderr.write('Missing SDS011 library: %s\n' % str(err))
+    sys.stderr.write('Using mock library.\n')
     sys.stderr.flush()
     from .mock_sds011 import SDS011
 except SerialException as err:
     import sys
-    sys.stderr.write('Using mock SDS011 serial device: "%s"!\n' % str(err))
+    sys.stderr.write('Using mock SDS011 serial device: %s\n' % str(err))
+    sys.stderr.write('Using mock library.\n')
     sys.stderr.flush()
     from .mock_sds011 import SDS011
 

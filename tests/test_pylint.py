@@ -34,19 +34,15 @@ class PylintTest(TestCase):
 
     @skipUnless(have_pylint,"Must have pylint executable installed")
     def test_library(self):
-        sys.path.insert(0, os.path.join(self.ROOT, "lib"))
-        for lib in ["lib/ts.py",
-                    "lib/device_config.py",
-                    "lib/sampler.py",
-                    "lib/dist.py",
-                    "lib/git_module.py",
-                    "lib/sds011.py",
-                    "lib/wifi_config.py",
-                    "lib/service.py",
-                    "lib/friskby_dao.py",
-                    "lib/fby_submitter",
-                    "lib/os_release.py",
-                    "bin/fby_client"]:
+        module_path = 'python/friskby/'
+        for lib in [module_path + 'ts.py',
+                    module_path + 'device_config.py',
+                    module_path + 'dist.py',
+                    module_path + 'git_module.py',
+                    module_path + 'sds011.py',
+                    module_path + 'wifi_config.py',
+                    module_path + 'friskby_dao.py',
+                    module_path + 'os_release.py']:
 
             exit_code = subprocess.check_call(["pylint", "-E", lib])
             self.assertEqual(exit_code, 0)
