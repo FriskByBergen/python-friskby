@@ -7,7 +7,7 @@ from unittest import TestCase, skipUnless
 import os.path
 import stat
 
-from device_config import DeviceConfig
+from friskby import DeviceConfig
 from context import TestContext
         
 

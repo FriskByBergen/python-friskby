@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import sys
 from sys import stderr, argv
 from os.path import abspath, isfile

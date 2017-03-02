@@ -3,8 +3,7 @@ from unittest import TestCase
 from random import random as rnd
 import sqlite3
 from datetime import datetime as dt
-from ts import TS
-from friskby_dao import FriskbyDao
+from friskby import TS, FriskbyDao
 
 def rand():
     return round(rnd()*100, 2)

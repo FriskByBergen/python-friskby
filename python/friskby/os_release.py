@@ -1,6 +1,9 @@
+from __future__ import print_function
+
 from sys import version as sys_version
 from os import uname
 from os.path import isfile
+import json
 from datetime import datetime as dt
 
 def _read_os_release(pfx='LSB_'):
@@ -11,8 +14,8 @@ def _read_os_release(pfx='LSB_'):
         return ln.strip().replace('"', '')
     def splitline(ln, pfx=''):
         if ln.count('=') == 1:
-            k,v = ln.split('=')
-            return pfx+k,v
+            k, v = ln.split('=')
+            return pfx+k, v
         return None
     props = {}
     with open(fname, 'r') as f:
@@ -40,17 +43,17 @@ def sys_info():
         pass
     if not lsb:
         lsb = {}
-    sysinf =  {'sysname'  : sysname,
-               'nodename' : nodename,
-               'release'  :  release,
-               'version'  : version,
-               'python'   : python_vs,
-               'pythoncc' : python_cc,
-               'requests' : req_vs,
-               'localtime': local_time}
+    sysinf = {'sysname'  : sysname,
+              'nodename' : nodename,
+              'machine'  : machine,
+              'release'  : release,
+              'version'  : version,
+              'python'   : python_vs,
+              'pythoncc' : python_cc,
+              'requests' : req_vs,
+              'localtime': local_time}
     sysinf.update(lsb)
     return sysinf
 
 if __name__ == '__main__':
-    import json
     print(json.dumps(sys_info(), indent=4, sort_keys=True))

@@ -1,28 +1,29 @@
-import tempfile 
+import tempfile
 from unittest import TestCase
 import os.path
 import stat
-from ts import TS
+
+from friskby import TS
 
 class TSTest(TestCase):
 
     def test_ts(self):
-        ts = TS( )
-        self.assertEqual( len(ts) , 0 )
-        
-        ts.append( 1.0 )
-        self.assertEqual( len(ts) , 1 )
+        ts = TS()
+        self.assertEqual(len(ts), 0)
 
-        ts.append( 0.0 )
-        ts.append( 5.0 )
-        self.assertEqual( len(ts) , 3 )
-        self.assertEqual( ts.mean() , 2.0 )
+        ts.append(1.0)
+        self.assertEqual(len(ts), 1)
+
+        ts.append(0.0)
+        ts.append(5.0)
+        self.assertEqual(len(ts), 3)
+        self.assertEqual(ts.mean(), 2.0)
 
     def setUp(self):
-        self._ts  = TS( [2.71828,3.141592,4.12310] )
-        self._tsa = TS( [2.71828,3.141592,4.12310], accuracy=2 )
-        self._tsb = TS( [6.1, 5.2, 4.3, 1.2, 2.3, 4.5, 5.6, 1000.123] )
-        self._tsc = TS( [6.1, 5.2, 4.3, 1.2, 2.3, 4.5, 5.6, 10.0,12.3] )
+        self._ts  = TS([2.71828,3.141592,4.12310])
+        self._tsa = TS([2.71828,3.141592,4.12310], accuracy=2)
+        self._tsb = TS([6.1, 5.2, 4.3, 1.2, 2.3, 4.5, 5.6, 1000.123])
+        self._tsc = TS([6.1, 5.2, 4.3, 1.2, 2.3, 4.5, 5.6, 10.0,12.3])
 
     def test_ts_init(self):
         self.assertEqual(3, len(self._ts))

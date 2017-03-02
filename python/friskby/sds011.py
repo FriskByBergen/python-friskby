@@ -1,3 +1,5 @@
+from __future__ import division
+
 import serial
 import time
 
@@ -8,15 +10,15 @@ class SDS011(object):
 
     sleep_time = 0.01
 
-    device_usb = serial.Serial('/dev/ttyUSB0', baudrate=9600, stopbits=1, parity="N",  timeout=2)
-    device_ama = serial.Serial('/dev/ttyAMA0', baudrate=9600, stopbits=1, parity="N",  timeout=2)
+    device_usb = serial.Serial('/dev/ttyUSB0', baudrate=9600, stopbits=1, parity="N", timeout=2)
+    device_ama = serial.Serial('/dev/ttyAMA0', baudrate=9600, stopbits=1, parity="N", timeout=2)
 
-    def __init__(self , usb):
+    def __init__(self, usb):
         if usb:
             self.device = SDS011.device_usb
         else:
             self.device = SDS011.device_ama
-    
+
     def read(self):
 
         # Read in loop until message start: AAC0
@@ -28,10 +30,10 @@ class SDS011(object):
                 s = self.device.read(1)
                 if ord(s) == SDS011.msg_cmd:
                     break
-            time.sleep( SDS011.sleep_time )
+            time.sleep(SDS011.sleep_time)
 
         s = self.device.read(8)
-                
+
         pm25hb = ord(s[0])
         pm25lb = ord(s[1])
         pm10hb = ord(s[2])
@@ -40,8 +42,8 @@ class SDS011(object):
         d6     = ord(s[5])
 
         cs     = ord(s[6])
-        tail   = ord(s[7]) 
-        
+        tail   = ord(s[7])
+
         cs_expected = (pm25hb + pm25lb + pm10hb + pm10lb + d5 + d6) % 256
         if cs != cs_expected:
             raise Exception("Checksum test failed")
@@ -51,5 +53,9 @@ class SDS011(object):
 
         pm25 = float(pm25hb + pm25lb*256)/10.0
         pm10 = float(pm10hb + pm10lb*256)/10.0
-                
-        return (pm10 , pm25)
+
+        return (pm10, pm25)
+
+    @classmethod
+    def is_mock(cls):
+        return False

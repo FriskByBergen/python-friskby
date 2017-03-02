@@ -1,6 +1,8 @@
-from __future__ import absolute_import
 """The friskby module
 """
+
+from __future__ import absolute_import
+
 from serial import SerialException
 from .git_module import GitModule
 from .device_config import DeviceConfig
@@ -22,7 +24,7 @@ except SerialException as err:
     sys.stderr.flush()
     from .mock_sds011 import SDS011
 
-    
+
 from .service_config import ServiceConfig
 from .ts import TS
 from .wifi_config import Network, WifiConfig

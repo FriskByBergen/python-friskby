@@ -1,3 +1,5 @@
+from __future__ import division
+
 class TS(object):
     """A class for representing time series.
 
@@ -6,7 +8,7 @@ class TS(object):
     Set accuracy = 3 to get rounding to third decimal.
     """
 
-    def __init__(self, data = None, accuracy=None):
+    def __init__(self, data=None, accuracy=None):
         self.data = []
         self.accuracy = accuracy
         if data:
@@ -18,8 +20,8 @@ class TS(object):
     def __getitem__(self, idx):
         return self._round(self.data[idx])
 
-    def append(self , d):
-        self.data.append( d )
+    def append(self, d):
+        self.data.append(d)
 
     def __repr__(self):
         return str(self)
