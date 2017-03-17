@@ -9,120 +9,8 @@ import json
 from traceback import format_exception
 
 import friskby
-from friskby import FriskbyDao, DeviceConfig, GitModule, sys_info, SDS011
-
-fby_submitter = importlib.import_module('fby_submitter')
-fby_sampler = importlib.import_module('fby_sampler')
-
-def get_sys_info():
-    info = ''
-    try:
-        info = sys_info()
-        if info:
-            info = json.dumps(info, indent=4, sort_keys=True)
-    except Exception as err:
-        info = 'Error getting sys_info: "%s".' % err
-    return info
-
-class FbyRunner(object):
-
-    def __init__(self, root=None, config_file=None, var_path=None):
-        if not root:
-            self.root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-        if not config_file:
-            self.config_file = os.path.join(self.root, "etc/config.json")
-        if not var_path:
-            var_path = os.path.join(self.root, "var")
-
-        self._sample_time = 10 * 60
-        self._sleep_time = 0.5
-        self._accuracy = 4 # round observation to fourth digit
-        self._config = None
-        self._sql_path = os.path.join(var_path, 'friskby.sql')
-        self._dao = FriskbyDao(self._sql_path)
-        self._submitter = fby_submitter.FbySubmitter(self._dao)
-
-    def get_dao(self):
-        return self._dao
-
-    def get_submitter(self):
-        return self._submitter
-
-    def install(self, config):
-        git_module = GitModule(url=config.getRepoURL())
-        git_module.checkout(config.getGitRef())
-        git_module.runTests("tests/run_tests")
-        git_module.install(self.root,
-                           files=friskby.files,
-                           directories=friskby.directories)
-        config.save(filename=self.config_file)
-
-
-    def rollback(self, config):
-        self.install(config)
-
-
-    def restart(self, config):
-        self.install(config)
-        os.execl(__file__, __file__)
-
-        raise Exception("Fatal error: os.execl() returned - trying to rollback")
-
-    def update_client(self, config):
-        new_config = config.downloadNew()
-        if config.updateRequired(new_config):
-            try:
-                config.logMessage("Restarting client - new version:%s" % new_config.getGitRef())
-                self.restart(new_config)
-            except:
-                exc_type, exc_value, exc_tb = sys.exc_info()
-                tb_list = format_exception(exc_type, exc_value, exc_tb)
-                config.logMessage("Restart failed - trying rollback", long_msg="".join(tb_list))
-                self.rollback(config)
-                config.logMessage("Rollback complete")
-
-
-    def _handle_post_exception(self, err, exc_info):
-        err_msg = '(unknown error for %s)' % str(type(err))
-        try:
-            err_msg = str(err)
-        except Exception:
-            pass
-        exc_type, exc_value, exc_tb = exc_info
-        tb_list = format_exception(exc_type, exc_value, exc_tb)
-        log_payload = 'Exception caught: "%s".' % (err_msg)
-        traceback = "".join(tb_list)
-        try:
-            self._config.logMessage(log_payload, long_msg=traceback)
-        except:
-            sys.stderr.write('Error submitting log message!')
-
-    def run(self):
-        self._config = DeviceConfig(self.config_file)
-        long_msg = get_sys_info()
-        self._config.logMessage("Starting up", long_msg=long_msg)
-        self._config.postGitVersion()
-
-        self._submitter.set_config(self._config)
-        sampler = fby_sampler.FbySampler(SDS011(True),
-                                         self._dao,
-                                         self._sample_time,
-                                         sleep_time=self._sleep_time,
-                                         accuracy=self._accuracy)
-
-        while True:
-            try:
-                print('Collecting ...')
-                sys.stdout.flush()
-                sampler.collect()
-
-                self._submitter.post()
-                print('Updating ...')
-                sys.stdout.flush()
-                self.update_client(self._config)
-            except Exception as err:
-                self._handle_post_exception(err, sys.exc_info())
-                raise
+from friskby import FriskbyDao, FriskbyRunner
+from friskby import DeviceConfig, GitModule, sys_info, SDS011
 
 
 if __name__ == "__main__":
@@ -130,5 +18,5 @@ if __name__ == "__main__":
     CONFIG_FILE = os.path.join(ROOT, "etc/config.json")
     VAR_PATH = os.path.join(ROOT, "var")
 
-    FBY = FbyRunner(root=ROOT, config_file=CONFIG_FILE, var_path=VAR_PATH)
+    FBY = FriskbyRunner(root=ROOT, config_file=CONFIG_FILE, var_path=VAR_PATH)
     FBY.run()

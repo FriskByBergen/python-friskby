@@ -8,6 +8,9 @@ from .git_module import GitModule
 from .device_config import DeviceConfig
 from .dist import files, directories
 from .friskby_dao import FriskbyDao
+from .friskby_sampler import FriskbySampler
+from .friskby_runner import FriskbyRunner
+from .friskby_submitter import FriskbySubmitter
 from .os_release import sys_info
 
 # if _os_getenv("FRISKBY_TEST"):
@@ -31,7 +34,7 @@ from .service_config import ServiceConfig
 from .ts import TS
 from .wifi_config import Network, WifiConfig
 
-__all__ = ['FriskbyDao', 'SDS011', 'ServiceConfig', 'TS',
+__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner', 'SDS011', 'ServiceConfig', 'TS',
            'GitModule', 'DeviceConfig', 'sys_info', 'WifiConfig', 'Network']
 
 __version__ = '0.60.0'
