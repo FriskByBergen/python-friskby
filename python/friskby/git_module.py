@@ -1,11 +1,8 @@
-import datetime
-import time
 import os.path
 import tempfile
 import subprocess
 import shutil
-from git.repo.base import Repo, GitCommandError
-
+from git.repo.base import Repo
 
 class GitModule(object):
 
@@ -30,7 +27,7 @@ class GitModule(object):
         else:
             self.work_dir = None
             self.repo = Repo(local_path)
-            origin = self.repo.remote(name = "origin")
+            origin = self.repo.remote(name="origin")
             origin.fetch()
 
 
@@ -97,7 +94,7 @@ class GitModule(object):
                 if not os.path.isdir(target_path):
                     os.makedirs(target_path)
 
-            for dirpath, dirnames, filenames in os.walk(self.absPath(dir_)):
+            for dirpath, _, filenames in os.walk(self.absPath(dir_)):
                 target_path = os.path.join(target, self.relPath(dirpath))
                 if not os.path.isdir(target_path):
                     os.makedirs(target_path)

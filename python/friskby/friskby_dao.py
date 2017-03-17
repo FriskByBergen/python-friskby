@@ -26,6 +26,7 @@ class FriskbyDao(object):
 
     def __init_sql(self):
         if not isfile(self._sql_path):
+            print('No database, constructing new: %s.' % self._sql_path)
             _id = '`id` INTEGER PRIMARY KEY'
             _val = '`value` FLOAT NOT NULL'
             _sen = '`sensor` TEXT NOT NULL'

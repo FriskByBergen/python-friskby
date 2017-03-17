@@ -4,8 +4,8 @@ import re
 import subprocess
 from collections import OrderedDict
 
-setting = re.compile(r"^\s*(?P<key>\w+)=\"?(?P<value>[-\w/]+)\"?$", re.MULTILINE)
-network = re.compile(r"^network=\{(?P<net_config>.+?)\}$", re.MULTILINE + re.DOTALL)
+SETTING = re.compile(r"^\s*(?P<key>\w+)=\"?(?P<value>[-\w/]+)\"?$", re.MULTILINE)
+NETWORK = re.compile(r"^network=\{(?P<net_config>.+?)\}$", re.MULTILINE + re.DOTALL)
 
 class Network(object):
     def __init__(self, d):
@@ -38,14 +38,14 @@ class WifiConfig(object):
         self.config_file = config_file
         with open(config_file, 'r') as f:
             content = f.read()
-            for (key, value) in setting.findall(content):
+            for (key, value) in SETTING.findall(content):
                 if not key in WifiConfig.network_settings:
                     self.__settings[key] = value
 
 
-            for net_config in network.findall(content):
+            for net_config in NETWORK.findall(content):
                 d = {}
-                for (key, value) in setting.findall(net_config):
+                for (key, value) in SETTING.findall(net_config):
                     d[key] = value
 
                 self.__networks[d["ssid"]] = Network(d)
@@ -53,8 +53,8 @@ class WifiConfig(object):
 
     def addnetwork(self, ssid, psk):
         if ssid in self.__networks:
-            network = self.__networks[ssid]
-            network.psk = psk
+            network_ = self.__networks[ssid]
+            network_.psk = psk
         else:
             self.__networks[ssid] = Network({"ssid" : ssid, "psk" : psk})
 
@@ -67,7 +67,7 @@ class WifiConfig(object):
         return self.__settings
 
 
-    def save(self, config_file = None):
+    def save(self, config_file=None):
         if config_file is None:
             config_file = self.config_file
 
@@ -75,8 +75,8 @@ class WifiConfig(object):
             for key, value in self.__settings.items():
                 f.write("%s=%s\n" % (key, value))
 
-            for network in self.__networks.values():
-                network.save(f)
+            for network_ in self.__networks.values():
+                network_.save(f)
 
     @classmethod
     def ifup(cls):

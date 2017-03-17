@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+"""An executable that samples data from the sensor and gives the values to the
+dao to persist.
+
+"""
 from __future__ import print_function
 
 import sys
-import time
-from datetime import datetime as dt
 
-from friskby import FriskbySampler, FriskbyDao, TS
+from friskby import FriskbySampler, FriskbyDao
 from friskby import SDS011
 
 if __name__ == '__main__':

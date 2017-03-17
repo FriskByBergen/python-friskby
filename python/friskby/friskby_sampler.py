@@ -4,7 +4,6 @@ import sys
 import time
 from datetime import datetime as dt
 
-from .friskby_dao import FriskbyDao
 from .ts import TS
 
 class FriskbySampler(object):

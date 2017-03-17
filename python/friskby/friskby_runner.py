@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 from __future__ import (print_function, absolute_import)
 
-import importlib # as long as we still invoke binaries from here
-
 import sys
 import os
 import json
@@ -14,21 +12,12 @@ from .device_config import DeviceConfig
 from .git_module import GitModule
 from .os_release import sys_info
 
-def get_sys_info():
-    info = ''
-    try:
-        info = sys_info()
-        if info:
-            info = json.dumps(info, indent=4, sort_keys=True)
-    except Exception as err:
-        info = 'Error getting sys_info: "%s".' % err
-    return info
-
 class FriskbyRunner(object):
 
     def __init__(self, root=None, config_file=None, var_path=None):
         if not root:
             self.root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+        self.config_file = config_file
         if not config_file:
             self.config_file = os.path.join(self.root, "etc/config.json")
         if not var_path:
@@ -95,7 +84,7 @@ class FriskbyRunner(object):
 
     def run(self):
         self._config = DeviceConfig(self.config_file)
-        long_msg = get_sys_info()
+        long_msg = self.get_sys_info()
         self._config.logMessage("Starting up", long_msg=long_msg)
         self._config.postGitVersion()
 
@@ -104,3 +93,14 @@ class FriskbyRunner(object):
         except Exception as err:
             self._handle_post_exception(err, sys.exc_info())
             raise
+
+    @classmethod
+    def get_sys_info(cls):
+        info = ''
+        try:
+            info = sys_info()
+            if info:
+                info = json.dumps(info, indent=4, sort_keys=True)
+        except Exception as err:
+            info = 'Error getting sys_info: "%s".' % err
+        return info

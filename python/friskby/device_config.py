@@ -11,6 +11,7 @@ import requests
 from .git_module import GitModule
 
 class DeviceConfig(object):
+    BASE_URL = 'https://api.github.com/repos/FriskByBergen/RPiParticle/git/refs/heads'
     config_timeout = 10 * 60
     required_keys = ["git_repo", "git_ref", "git_follow", "post_key",
                      "sensor_list", "post_path", "config_path", "server_url",
@@ -86,27 +87,23 @@ class DeviceConfig(object):
     def getGitFollow(self):
         return self.data["git_follow"]
 
+    def _download_new_sha(self):
+        new_sha = None
+        api_url = "%s/%s" % (self.BASE_URL, self.getGitRef())
+        response = requests.get(api_url, timeout=10)
+        if response.status_code == 200:
+            data = json.loads( response.content )
+            new_sha = data["object"]["sha"]
+        return new_sha
 
     def updateRequired(self, new_config):
         if self.getGitFollow():
             if self.sha is None:
                 return True
-
-            try:
-                _github = 'https://api.github.com/repos'
-                _base = _github + '/FriskByBergen/RPiParticle/git/refs/heads/%s'
-                api_url = _base % self.getGitRef()
-                response = requests.get(api_url, timeout=10)
-                if response.status_code == 200:
-                    data = json.loads(response.content)
-                    new_sha = data["object"]["sha"]
-                    if new_sha != self.sha:
-                        return True
-            except:
-                pass
-
+            new_sha = self._download_new_sha()
+            if new_sha != self.sha:
+                    return True
         return self.getGitRef() != new_config.getGitRef()
-
 
     def downloadNew(self):
         diff = datetime.datetime.now() - self.config_ts
@@ -114,13 +111,9 @@ class DeviceConfig(object):
             return self
 
         self.config_ts = datetime.datetime.now()
-        update_url = url = "%s/%s" % (self.getServerURL(), self.getConfigPath())
-        try:
-            new_config = self.download(update_url, post_key=self.getPostKey())
-            return new_config
-        except:
-            return self
-
+        update_url = "%s/%s" % (self.getServerURL(), self.getConfigPath())
+        new_config = self.download(update_url, post_key=self.getPostKey())
+        return new_config
 
 
     @classmethod
@@ -129,7 +122,7 @@ class DeviceConfig(object):
         if response.status_code != 200:
             raise ValueError("http GET return status:%s" % response.status_code)
 
-        fd, config_file = tempfile.mkstemp()
+        _, config_file = tempfile.mkstemp()
         data = json.loads(response.content)
         tmp = urlparse(url)
         config = data["client_config"]

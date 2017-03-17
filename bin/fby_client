@@ -1,17 +1,12 @@
 #!/usr/bin/env python
+"""The old runner, checks if there is a new update in git and in the friskby
+cloud.
+
+"""
+
 from __future__ import (print_function, absolute_import)
-
-import importlib # as long as we still invoke binaries from here
-
-import sys
 import os
-import json
-from traceback import format_exception
-
-import friskby
-from friskby import FriskbyDao, FriskbyRunner
-from friskby import DeviceConfig, GitModule, sys_info, SDS011
-
+from friskby import FriskbyRunner
 
 if __name__ == "__main__":
     ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))

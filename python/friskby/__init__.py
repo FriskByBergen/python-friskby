@@ -34,7 +34,8 @@ from .service_config import ServiceConfig
 from .ts import TS
 from .wifi_config import Network, WifiConfig
 
-__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner', 'SDS011', 'ServiceConfig', 'TS',
-           'GitModule', 'DeviceConfig', 'sys_info', 'WifiConfig', 'Network']
+__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
+           'SDS011', 'ServiceConfig', 'TS', 'GitModule', 'DeviceConfig',
+           'sys_info', 'WifiConfig', 'Network']
 
 __version__ = '0.60.0'
