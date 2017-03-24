@@ -38,8 +38,8 @@ class FriskbyRunner(object):
         git_module.checkout(config.getGitRef())
         git_module.runTests("tests/run_tests")
         git_module.install(self.root,
-                           files=friskby.files,
-                           directories=friskby.directories)
+                           files=None,
+                           directories=None) # TODO
         config.save(filename=self.config_file)
 
 

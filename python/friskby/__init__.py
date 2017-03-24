@@ -6,7 +6,6 @@ from __future__ import absolute_import
 from serial import SerialException
 from .git_module import GitModule
 from .device_config import DeviceConfig
-from .dist import files, directories
 from .friskby_dao import FriskbyDao
 from .friskby_sampler import FriskbySampler
 from .friskby_runner import FriskbyRunner
@@ -32,10 +31,9 @@ except SerialException as err:
 
 from .service_config import ServiceConfig
 from .ts import TS
-from .wifi_config import Network, WifiConfig
 
 __all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
            'SDS011', 'ServiceConfig', 'TS', 'GitModule', 'DeviceConfig',
-           'sys_info', 'WifiConfig', 'Network']
+           'sys_info']
 
 __version__ = '0.60.0'
