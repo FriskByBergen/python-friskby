@@ -2,8 +2,6 @@ from tempfile import NamedTemporaryFile as temp
 from datetime import datetime as dt
 from unittest import TestCase
 
-from serial import SerialException
-
 from friskby import FriskbyDao, FriskbySampler, SDS011
 
 class SamplerTest(TestCase):

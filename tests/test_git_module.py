@@ -3,7 +3,6 @@ from unittest import TestCase, skipIf
 import os.path
 from os import environ
 import stat
-from serial import SerialException
 
 from friskby import SDS011, GitModule
 
@@ -86,32 +85,32 @@ class GitModuleTest(TestCase):
 
     def testCreate(self):
         with self.assertRaises(GitCommandError):
-            gitm = GitModule(url = "https://does/not/exist")
+            GitModule(url = "https://does/not/exist")
 
         # Must have either url or local_path as arguments.
         with self.assertRaises(ValueError):
-            gitm = GitModule()
+            GitModule()
 
         # Must have exeactly *one* of url or local_path
         with self.assertRaises(ValueError):
-            gitm = GitModule(url = "https://xxx", local_path = "/local")
+            GitModule(url = "https://xxx", local_path = "/local")
 
         with self.assertRaises(NoSuchPathError):
-            gitm = GitModule(local_path = "/tmp/does/not/exist")
+            GitModule(local_path = "/tmp/does/not/exist")
 
         local_path = tempfile.mkdtemp()
         with self.assertRaises(InvalidGitRepositoryError):
-            gitm = GitModule(local_path = local_path)
+            GitModule(local_path = local_path)
 
 
     @skipIf(ISRPI, "Git commit testing not run on Raspberry pi")
     def test_create_no_origin(self):
         origin_repo = make_origin()
-        client_repo = make_client(origin_repo)
+        make_client(origin_repo)
 
         # Clone from a repository without remote origin - should fail:
         with self.assertRaises(ValueError):
-            gitm = GitModule(local_path = origin_repo.working_tree_dir)
+            GitModule(local_path = origin_repo.working_tree_dir)
 
 
 
@@ -123,14 +122,14 @@ class GitModuleTest(TestCase):
         self.assertEqual(gitm.getRoot(), client_repo.working_tree_dir)
 
         gitm.checkout("master")
-        self.assertEqual(os.path.join(gitm.getRoot(), "file.txt"), gitm.absPath("file.txt"))
-
+        self.assertEqual(os.path.join(gitm.getRoot(), "file.txt"),
+                         gitm.absPath("file.txt"))
 
         with self.assertRaises(IOError):
-            file2 = gitm.absPath("file2.txt")
+            gitm.absPath("file2.txt")
 
         gitm.checkout("version2")
-        file2 = gitm.absPath("file2.txt")
+        gitm.absPath("file2.txt")
 
         with self.assertRaises(GitCommandError):
             gitm.checkout("does-not-exist")

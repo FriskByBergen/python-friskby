@@ -1,8 +1,4 @@
-import tempfile
 from unittest import TestCase
-import os.path
-import stat
-
 from friskby import TS
 
 class TSTest(TestCase):

@@ -8,14 +8,25 @@ try:
     subprocess.call(["pylint", "--version"])
     HAVE_PYLINT = True
 except OSError:
-    sys.stderr.write('** Warning: could not find Python checker "pylint" - static checks skipped')
+    msg = '** Warning: Could not find pylint. Static checks skipped'
+    sys.stderr.write(msg)
     HAVE_PYLINT = False
 
 class PylintTest(TestCase):
+
+    def _do_test_files(self, path):
+        """pylint -E on all .py files in path"""
+        for fname in listdir(path):
+            fpath = join(path, fname)
+            if len(fname) > 2 and fpath[-3:] == '.py' and isfile(fpath):
+                retcode = subprocess.call(["pylint", "-E", fpath])
+                self.assertEqual(0, retcode,
+                                 msg='linting required for %s' % fpath)
+
     @skipUnless(HAVE_PYLINT, "Must have pylint executable installed")
     def test_library(self):
-        module_path = 'python/friskby/'
-        for fname in listdir(module_path):
-            fpath = join(module_path, fname)
-            if len(fname) > 2 and fpath[-3:] == '.py' and isfile(fpath):
-                subprocess.check_call(["pylint", "-E", fpath])
+        self._do_test_files('python/friskby/')
+
+    @skipUnless(HAVE_PYLINT, "Must have pylint executable installed")
+    def test_tests_meta(self):
+        self._do_test_files('tests/')
