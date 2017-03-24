@@ -1,4 +1,4 @@
-# python-friskby ![build status](https://api.travis-ci.org/FriskByBergen/python-friskby.svg?branch=master "TravisCI Build Status")
+# python-friskby [![Build Status](https://travis-ci.org/FriskByBergen/python-friskby.svg?branch=master)](https://travis-ci.org/FriskByBergen/python-friskby)
 
 ## Overview
 
