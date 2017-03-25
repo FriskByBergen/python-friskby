@@ -25,7 +25,7 @@ class PylintTest(TestCase):
 
     @skipUnless(HAVE_PYLINT, "Must have pylint executable installed")
     def test_library(self):
-        self._do_test_files('python/friskby/')
+        self._do_test_files('friskby/')
 
     @skipUnless(HAVE_PYLINT, "Must have pylint executable installed")
     def test_tests_meta(self):
