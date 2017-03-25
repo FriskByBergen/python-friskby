@@ -25,6 +25,7 @@ class FriskbyDao(object):
         return self._sql_path
 
     def __init_sql(self):
+        # TODO make directory if not exists
         if not isfile(self._sql_path):
             print('No database, constructing new: %s.' % self._sql_path)
             _id = '`id` INTEGER PRIMARY KEY'
@@ -109,11 +110,13 @@ class FriskbyDao(object):
     def __repr__(self):
         try:
             num, num_up = self.get_num_rows(), self.get_num_rows(uploaded_status=True)
-            fmt = 'FriskbyDao(num_rows = %s, non_uploaded = %s, path = %s)'
+            fmt = 'FriskbyDao(num_rows=%s, non_uploaded=%s, path=%s)'
             return fmt % (num, num_up, self._sql_path)
         except:
-            return 'FriskbyDao(path = %s)' % (self._sql_path)
+            return 'FriskbyDao(path=%s)' % (self._sql_path)
 
 if __name__ == '__main__':
     if len(argv) > 1:
         FriskbyDao(argv[1])
+    else:
+        sys.exit('Need a path to an sqlite database.')

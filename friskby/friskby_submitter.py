@@ -15,15 +15,9 @@ class FriskbySubmitter(object):
         self.device_config = device_config
         self.dao = dao
 
-    def set_config(self, device_config):
-        """Sets the current device config"""
-        self.device_config = device_config
-
-    def get_dao(self):
-        """Returns the FriskbyDao object used by this submitter"""
-        return self.dao
-
     def _upload(self, rows):
+        if not self.device_config:
+            raise ValueError('No device config set for submitter!')
         print('Attempting to upload.')
         sys.stdout.flush()
         # id, value, sensor, timestamp, uploaded
@@ -65,6 +59,7 @@ class FriskbySubmitter(object):
         to_upload = self.dao.get_non_uploaded()
         print('Submitting ...')
         # TODO this is not particularly safe!
+        # get_non_uploaded should at the very least be a context manager.
         sys.stdout.flush()
         if self._upload(to_upload):
             self.dao.mark_uploaded(to_upload)

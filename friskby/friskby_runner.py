@@ -6,7 +6,6 @@ import os
 import json
 from traceback import format_exception
 
-import friskby
 from .friskby_dao import FriskbyDao
 from .device_config import DeviceConfig
 from .git_module import GitModule
@@ -29,9 +28,6 @@ class FriskbyRunner(object):
         self._config = None
         self._sql_path = os.path.join(var_path, 'friskby.sql')
         self._dao = FriskbyDao(self._sql_path)
-
-    def get_dao(self):
-        return self._dao
 
     def install(self, config):
         git_module = GitModule(url=config.getRepoURL())
@@ -96,7 +92,7 @@ class FriskbyRunner(object):
 
     @classmethod
     def get_sys_info(cls):
-        info = ''
+        info = {}
         try:
             info = sys_info()
             if info:

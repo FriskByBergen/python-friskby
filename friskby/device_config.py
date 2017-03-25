@@ -102,7 +102,7 @@ class DeviceConfig(object):
                 return True
             new_sha = self._download_new_sha()
             if new_sha != self.sha:
-                    return True
+                return True
         return self.getGitRef() != new_config.getGitRef()
 
     def downloadNew(self):
