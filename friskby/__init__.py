@@ -8,7 +8,6 @@ from .git_module import GitModule
 from .device_config import DeviceConfig
 from .friskby_dao import FriskbyDao
 from .friskby_sampler import FriskbySampler
-from .friskby_runner import FriskbyRunner
 from .friskby_submitter import FriskbySubmitter
 from .os_release import sys_info
 
@@ -31,7 +30,7 @@ except SerialException as err:
 from .service_config import ServiceConfig
 from .ts import TS
 
-__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
+__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter',
            'SDS011', 'ServiceConfig', 'TS', 'GitModule', 'DeviceConfig',
            'sys_info']
 
