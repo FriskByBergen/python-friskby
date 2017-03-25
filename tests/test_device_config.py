@@ -23,6 +23,21 @@ class DeviceConfigTest(TestCase):
         fd, self.config_file = tempfile.mkstemp()
         os.close(fd)
 
+        self.conf_no_key = {"git_follow" : True, "git_repo" : "github",
+                            "git_ref" : "master", "sensor_list" : ["A", "B", "C"],
+                            "post_path" : "XYZ", "server_url" : "http:???",
+                            "config_path" : "xyz", "device_id" : "dev0"}
+
+        self.conf = {"git_follow" : True, "git_repo" : "github", "git_ref" :
+                     "master", "sensor_list" : ["A", "B", "C"], "post_key" :
+                     "Key", "post_path" : "XYZ", "server_url" : "http:???",
+                     "config_path" : "xyz", "device_id" : "dev0"}
+
+        self.conf2 = {"git_follow" : True, "git_repo" : "github", "git_ref" :
+                      "master", "sensor_list" : ["A", "B", "C"], "post_key" :
+                      "KeyX", "post_path" : "XYZ", "server_url" : "http:???",
+                      "config_path" : "xyz", "device_id" : "dev0"}
+
         self.tmpdir = tempfile.mkdtemp()
         self.context = TestContext()
 
@@ -33,6 +48,11 @@ class DeviceConfigTest(TestCase):
         if os.path.isdir(self.tmpdir):
             shutil.rmtree(self.tmpdir)
 
+    def _fwrite_cfg(self, cfg, fname=None):
+        if fname is None:
+            fname = self.config_file
+        with open(fname, "w") as f:
+            f.write(json.dumps(cfg))
 
 
     def test_create(self):
@@ -43,29 +63,19 @@ class DeviceConfigTest(TestCase):
             f.write("No - not valid JSON")
 
         with self.assertRaises(ValueError):
-            _ = DeviceConfig(self.config_file)
+            DeviceConfig(self.config_file)
 
-        conf = {"key" : "value"}
-        with open(self.config_file, "w") as f:
-            f.write(json.dumps(conf))
-
+        self._fwrite_cfg({"key" : "value"})
         with self.assertRaises(KeyError):
             config = DeviceConfig(self.config_file)
 
-        conf_no_key = {"git_follow" : True, "git_repo" : "github", "git_ref" : "master", "sensor_list" : ["A", "B", "C"],
-                       "post_path" : "XYZ", "server_url" : "http:???", "config_path" : "xyz", "device_id" : "dev0"}
-        with open(self.config_file, "w") as f:
-            f.write(json.dumps(conf_no_key))
-
+        self._fwrite_cfg(self.conf_no_key)
         with self.assertRaises(KeyError):
             config = DeviceConfig(self.config_file)
 
         config = DeviceConfig(self.config_file, post_key="Key")
 
-        conf = {"git_follow" : True, "git_repo" : "github", "git_ref" : "master", "sensor_list" : ["A", "B", "C"], "post_key" : "Key",
-                "post_path" : "XYZ", "server_url" : "http:???", "config_path" : "xyz", "device_id" : "dev0"}
-        with open(self.config_file, "w") as f:
-            f.write(json.dumps(conf))
+        self._fwrite_cfg(self.conf)
 
         config = DeviceConfig(self.config_file)
         config_file2 = os.path.join(self.tmpdir, "config2")
@@ -80,17 +90,8 @@ class DeviceConfigTest(TestCase):
 
         self.assertEqual("github", config2.getRepoURL())
 
-        with open("conf", "w") as f:
-            f.write(json.dumps(conf))
-
-        conf2 = {"git_follow" : True, "git_repo" : "github", "git_ref" : "master",
-                 "sensor_list" : ["A", "B", "C"], "post_key" : "KeyX",
-                 "post_path" : "XYZ", "server_url" : "http:???", "config_path" : "xyz",
-                 "device_id" : "dev0"}
-
-        with open("conf2", "w") as f:
-            f.write(json.dumps(conf2))
-
+        self._fwrite_cfg(self.conf,  fname='conf')
+        self._fwrite_cfg(self.conf2, fname='conf2')
 
         c1 = DeviceConfig("conf")
         c2 = DeviceConfig("conf")
@@ -109,10 +110,12 @@ class DeviceConfigTest(TestCase):
     @skipUnless(NETWORK, "Requires network access")
     def test_url_get(self):
         with self.assertRaises(requests.ConnectionError):
-            _ = DeviceConfig.download("http://does/not/exist")
+            DeviceConfig.download("http://does/not/exist")
 
-        # The post_key supplied here is not valid for anything, but we pass the "must have post_key test".
-        deviceconfig = DeviceConfig.download("https://friskby.herokuapp.com/sensor/api/device/FriskPITest/", post_key="xxx")
+        # The post_key supplied here is not valid for anything, but we pass the
+        # "must have post_key test".
+        url_ = "https://friskby.herokuapp.com/sensor/api/device/FriskPITest/"
+        deviceconfig = DeviceConfig.download(url_, post_key="xxx")
         deviceconfig.save(filename=self.config_file)
 
 
@@ -120,3 +123,10 @@ class DeviceConfigTest(TestCase):
     def test_post_msg(self):
         status = self.context.device_config.logMessage("Testing")
         self.assertEqual(status, 201)
+
+    def test_repr(self):
+        self._fwrite_cfg(self.conf)
+        config = DeviceConfig(self.config_file)
+        pfx = 'DeviceConfig('
+        rep = repr(config)
+        self.assertEqual(pfx, rep[:len(pfx)])
