@@ -12,7 +12,6 @@ from .friskby_runner import FriskbyRunner
 from .friskby_submitter import FriskbySubmitter
 from .os_release import sys_info
 
-# if _os_getenv("FRISKBY_TEST"):
 try:
     from sds011 import SDS011
 except ImportError as err:
@@ -36,4 +35,4 @@ __all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
            'SDS011', 'ServiceConfig', 'TS', 'GitModule', 'DeviceConfig',
            'sys_info']
 
-__version__ = '0.61.0'
+__version__ = '0.61.2'
