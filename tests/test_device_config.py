@@ -120,3 +120,21 @@ class DeviceConfigTest(TestCase):
     def test_post_msg(self):
         status = self.context.device_config.logMessage("Testing")
         self.assertEqual(status, 201)
+
+    def test_repr(self):
+        conf = {"git_follow" : True,
+                "git_repo" : "github",
+                "git_ref" : "master",
+                "sensor_list" : ["A", "B", "C"],
+                "post_key" : "Key",
+                "post_path" : "XYZ",
+                "server_url" : "http:???",
+                "config_path" : "xyz",
+                "device_id" : "dev0"}
+        with open(self.config_file, "w") as f:
+            f.write(json.dumps(conf))
+
+        config = DeviceConfig(self.config_file)
+        pfx = 'DeviceConfig('
+        rep = repr(config)
+        self.assertEqual(pfx, rep[:len(pfx)])

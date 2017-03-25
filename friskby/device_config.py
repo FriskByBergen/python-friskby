@@ -171,3 +171,11 @@ class DeviceConfig(object):
                      data=json.dumps(data),
                      headers=headers,
                      timeout=10)
+
+    def __repr__(self):
+        content = '{}'
+        try:
+            content = json.dumps(self.data)
+        except ValueError:
+            pass
+        return 'DeviceConfig(%s)' % content
