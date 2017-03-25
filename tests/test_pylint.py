@@ -4,21 +4,33 @@ import sys
 from unittest import TestCase, skipUnless
 import subprocess
 
-try:
-    subprocess.call(["pylint", "--version"])
-    HAVE_PYLINT = True
-except OSError:
-    msg = '** Warning: Could not find pylint. Static checks skipped'
+retcall = subprocess.call(["which", "pylint"]) # which returns 1 if no pylint
+HAVE_PYLINT = True
+if retcall != 0:
+    msg = '\n\n** Warning: Could not find pylint. Static checks skipped!\n\n'
     sys.stderr.write(msg)
     HAVE_PYLINT = False
 
 class PylintTest(TestCase):
 
+    def _is_python_file(self, path, fname):
+        fpath = join(path, fname)
+        if not isfile(fpath):
+            return False
+        if fname[-3:] == '.py':
+            return True
+        if fname[:4] == 'fby_':
+            return True
+        if fname == 'run_tests':
+            return True
+        return False
+
     def _do_test_files(self, path):
         """pylint -E on all .py files in path"""
         for fname in listdir(path):
-            fpath = join(path, fname)
-            if len(fname) > 2 and fpath[-3:] == '.py' and isfile(fpath):
+            if len(fname) > 2 and self._is_python_file(path, fname):
+                fpath = join(path, fname)
+                print('Linting %s.' % fpath)
                 retcode = subprocess.call(["pylint", "-E", fpath])
                 self.assertEqual(0, retcode,
                                  msg='linting required for %s' % fpath)
