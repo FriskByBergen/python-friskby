@@ -7,16 +7,16 @@ measurements to a webserver.
 
 ## Install
 
-To install, you may use pip, but you have to git clone first since we haven't
-yet deployed the first version.
+To install, you may use pip:
 
+```bash
+sudo pip install friskby
 ```
+
+Or from source:
+
+```bash
 git clone https://github.com/FriskByBergen/python-friskby.git
 cd python-friskby
 sudo pip install .
 ```
-
-
-## TODO
-Will make this installable as a pip package, in the mean time, if `python/` is
-accessible in your `PYTHONPATH`, you can use the `friskby` module (for good).
