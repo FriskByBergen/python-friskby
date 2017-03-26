@@ -1,17 +1,18 @@
 from setuptools import setup
 
-_dependencies = ['requests', 'gitpython', 'pyserial', 'python-dateutil']
+DEPENDENCIES = ['requests', 'gitpython', 'pyserial', 'python-dateutil']
 
 setup(
     name='friskby',
-    version='0.61.2',
+    version='0.62.0',
     description='The friskby module',
     url='http://github.com/FriskbyBergen/python-friskby',
     author='Friskby Bergen',
+    keywords='friskby bergen frisk by python-friskby a-small-code air',
     author_email='pgdr@statoil.com',
     license='GNU General Public License, Version 3',
     packages=['friskby'],
     zip_safe=False,
-    setup_requires=_dependencies,
-    install_requires=_dependencies
+    setup_requires=DEPENDENCIES,
+    install_requires=DEPENDENCIES
 )
