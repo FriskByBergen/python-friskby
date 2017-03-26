@@ -1,5 +1,4 @@
 requests
-gitpython
 pyserial
 pylint
 python-dateutil

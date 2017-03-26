@@ -8,7 +8,6 @@ from traceback import format_exception
 
 from .friskby_dao import FriskbyDao
 from .device_config import DeviceConfig
-from .git_module import GitModule
 from .os_release import sys_info
 
 class FriskbyRunner(object):
@@ -30,37 +29,11 @@ class FriskbyRunner(object):
         self._dao = FriskbyDao(self._sql_path)
 
     def install(self, config):
-        git_module = GitModule(url=config.getRepoURL())
-        git_module.checkout(config.getGitRef())
-        git_module.runTests("tests/run_tests")
-        git_module.install(self.root,
-                           files=None,
-                           directories=None) # TODO
+        # TODO should we do pip install --upgrade reuirements from config?
         config.save(filename=self.config_file)
 
-
-    def rollback(self, config):
-        self.install(config)
-
-
-    def restart(self, config):
-        self.install(config)
-        os.execl(__file__, __file__)
-
-        raise Exception("Fatal error: os.execl() returned - trying to rollback")
-
     def update_client(self, config):
-        new_config = config.downloadNew()
-        if config.updateRequired(new_config):
-            try:
-                config.logMessage("Restarting client - new version:%s" % new_config.getGitRef())
-                self.restart(new_config)
-            except:
-                exc_type, exc_value, exc_tb = sys.exc_info()
-                tb_list = format_exception(exc_type, exc_value, exc_tb)
-                config.logMessage("Restart failed - trying rollback", long_msg="".join(tb_list))
-                self.rollback(config)
-                config.logMessage("Rollback complete")
+        new_config = config.downloadNew() # TODO what is this now?
 
 
     def _handle_post_exception(self, err, exc_info):
@@ -82,7 +55,7 @@ class FriskbyRunner(object):
         self._config = DeviceConfig(self.config_file)
         long_msg = self.get_sys_info()
         self._config.logMessage("Starting up", long_msg=long_msg)
-        self._config.postGitVersion()
+        self._config.postVersion()
 
         try:
             self.update_client(self._config)
