@@ -2,7 +2,8 @@ from __future__ import print_function
 
 import sys
 from sys import stderr, argv
-from os.path import abspath, isfile
+from os import makedirs
+from os.path import abspath, isfile, isdir, split
 import sqlite3
 from datetime import datetime as dt
 from dateutil import parser as dt_parser
@@ -25,7 +26,12 @@ class FriskbyDao(object):
         return self._sql_path
 
     def __init_sql(self):
-        # TODO make directory if not exists
+        if isfile(self._sql_path):
+            return # nothing to do
+
+        _path, _ = split(self._sql_path)
+        if not isdir(_path):
+            makedirs(_path) # equivalent to `mkdir -p _path`
         if not isfile(self._sql_path):
             print('No database, constructing new: %s.' % self._sql_path)
             _id = '`id` INTEGER PRIMARY KEY'

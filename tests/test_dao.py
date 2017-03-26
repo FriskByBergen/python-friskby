@@ -1,6 +1,6 @@
 from tempfile import NamedTemporaryFile as temp
 from unittest import TestCase
-from random import random as rnd
+from random import random as rnd, randint
 import sqlite3
 from datetime import datetime as dt
 from friskby import TS, FriskbyDao
@@ -8,10 +8,14 @@ from friskby import TS, FriskbyDao
 def rand():
     return round(rnd()*100, 2)
 
-def gen_rand_ts():
+def gen_rand_ts(value=None):
+    """Uses value if given, else random"""
     t = TS()
     for _ in range(3):
-        t.append(rand())
+        if value:
+            t.append(value)
+        else:
+            t.append(rand())
     return t
 
 class DaoTest(TestCase):
@@ -79,3 +83,22 @@ class DaoTest(TestCase):
         delta = now - out[3]
         # checking that we're in the same timezone
         self.assertTrue(abs(delta.total_seconds()) < 1000)
+
+    def test_create_directory_structure(self):
+        _tmp_dir = '/tmp/friskby/%d/no/such/dir/here' % randint(2**32, 2**42)
+        _fpath = '%s/friskby.sql' % _tmp_dir
+        dao = FriskbyDao(_fpath)
+        sqlpath = dao.get_path()
+        self.assertEqual(_fpath, sqlpath)
+        t10 = gen_rand_ts(value=26.8)
+        t25 = gen_rand_ts(value=19.90)
+        self.dao.persist_ts((t10, t25))
+        # data: 2 elts of (id, value, sensor, timestamp, upl)
+        data = self.dao.get_non_uploaded()
+        self.assertEqual(2, len(data))
+        db_10, db_25 = data
+        if db_10[2] != 'PM10':
+            db_25, db_10 = data
+
+        self.assertEqual(26.8, db_10[1])
+        self.assertEqual(19.9, db_25[1])

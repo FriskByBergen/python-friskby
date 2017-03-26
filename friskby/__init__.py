@@ -35,4 +35,4 @@ __all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
            'SDS011', 'ServiceConfig', 'TS', 'GitModule', 'DeviceConfig',
            'sys_info']
 
-__version__ = '0.61.2'
+__version__ = '0.62.0'
