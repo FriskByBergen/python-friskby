@@ -5,19 +5,22 @@ import sys
 import json
 import requests
 
+from .friskby_dao import FriskbyDao
+from .device_config import DeviceConfig
+
 class FriskbySubmitter(object):
     """This class submits data from a database to the friskby cloud, then proceeds
     to mark the uploaded data as such.
 
     """
 
-    def __init__(self, dao, device_config=None):
-        self.device_config = device_config
-        self.dao = dao
+    def __init__(self, sql_path, cfg_path, post_key=None):
+        self.device_config = DeviceConfig(cfg_path, post_key=post_key)
+        self.dao = FriskbyDao(sql_path)
 
     def _upload(self, rows):
-        if not self.device_config:
-            raise ValueError('No device config set for submitter!')
+        if not rows:
+            return
         print('Attempting to upload.')
         sys.stdout.flush()
         # id, value, sensor, timestamp, uploaded

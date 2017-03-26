@@ -9,9 +9,8 @@ from urlparse import urlparse
 import requests
 
 class DeviceConfig(object):
-    required_keys = ["git_repo", "git_ref", "git_follow", "post_key",
-                     "sensor_list", "post_path", "config_path", "server_url",
-                     "device_id"]
+    required_keys = ["post_key", "sensor_list", "post_path", "config_path",
+                     "server_url", "device_id"]
 
     def __init__(self, filename, post_key=None):
         if not os.path.isfile(filename):
@@ -124,7 +123,7 @@ class DeviceConfig(object):
 
     def postVersion(self):
         data = {"key"     : self.getPostKey(),
-                "git_ref" : "%s / %s" % ('', self.sha)} # TODO fix
+                "git_ref" : "%s / %s" % self.get_version()}
         headers = {"Content-Type": "application/json"}
 
         requests.put("%s/sensor/api/device/%s/" %
