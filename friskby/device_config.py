@@ -8,14 +8,9 @@ import tempfile
 from urlparse import urlparse
 import requests
 
-from .git_module import GitModule
-
 class DeviceConfig(object):
-    BASE_URL = 'https://api.github.com/repos/FriskByBergen/RPiParticle/git/refs/heads'
-    config_timeout = 10 * 60
-    required_keys = ["git_repo", "git_ref", "git_follow", "post_key",
-                     "sensor_list", "post_path", "config_path", "server_url",
-                     "device_id"]
+    required_keys = ["post_key", "sensor_list", "post_path", "config_path",
+                     "server_url", "device_id"]
 
     def __init__(self, filename, post_key=None):
         if not os.path.isfile(filename):
@@ -37,6 +32,8 @@ class DeviceConfig(object):
         self.data = config
         self.config_ts = datetime.datetime.now()
 
+    def get_version(self):
+        return '0.0.0' # TODO fix
 
     def __eq__(self, other):
         return self.data == other.data
@@ -72,44 +69,16 @@ class DeviceConfig(object):
     def getPostURL(self):
         return "%s/%s" % (self.data["server_url"], self.data["post_path"])
 
-    def getRepoURL(self):
-        return self.data["git_repo"]
-
-    def getGitRef(self):
-        return self.data["git_ref"]
-
     def getDeviceID(self):
         return self.data["device_id"]
 
     def getPostKey(self):
         return self.data["post_key"]
 
-    def getGitFollow(self):
-        return self.data["git_follow"]
-
-    def _download_new_sha(self):
-        new_sha = None
-        api_url = "%s/%s" % (self.BASE_URL, self.getGitRef())
-        response = requests.get(api_url, timeout=10)
-        if response.status_code == 200:
-            data = json.loads( response.content )
-            new_sha = data["object"]["sha"]
-        return new_sha
-
     def updateRequired(self, new_config):
-        if self.getGitFollow():
-            if self.sha is None:
-                return True
-            new_sha = self._download_new_sha()
-            if new_sha != self.sha:
-                return True
-        return self.getGitRef() != new_config.getGitRef()
+        return True # TODO add logic
 
     def downloadNew(self):
-        diff = datetime.datetime.now() - self.config_ts
-        if diff.total_seconds() < self.config_timeout:
-            return self
-
         self.config_ts = datetime.datetime.now()
         update_url = "%s/%s" % (self.getServerURL(), self.getConfigPath())
         new_config = self.download(update_url, post_key=self.getPostKey())
@@ -152,18 +121,9 @@ class DeviceConfig(object):
                                  headers=headers, timeout=10)
         return response.status_code
 
-
-
-    def postGitVersion(self):
-        try:
-            git_module = GitModule(url=self.getRepoURL())
-            git_module.checkout(self.getGitRef())
-            self.sha = git_module.getHeadSHA()
-        except Exception as err:
-            stderr.write('Error checking out new git version: "%s".' % err)
-
+    def postVersion(self):
         data = {"key"     : self.getPostKey(),
-                "git_ref" : "%s / %s" % (self.getGitRef(), self.sha)}
+                "git_ref" : "%s / %s" % self.get_version()}
         headers = {"Content-Type": "application/json"}
 
         requests.put("%s/sensor/api/device/%s/" %

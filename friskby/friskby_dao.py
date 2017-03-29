@@ -123,6 +123,6 @@ class FriskbyDao(object):
 
 if __name__ == '__main__':
     if len(argv) > 1:
-        FriskbyDao(argv[1])
+        print(FriskbyDao(argv[1]))
     else:
         sys.exit('Need a path to an sqlite database.')

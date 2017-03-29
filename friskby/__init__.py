@@ -4,7 +4,6 @@
 from __future__ import absolute_import
 
 from serial import SerialException
-from .git_module import GitModule
 from .device_config import DeviceConfig
 from .friskby_dao import FriskbyDao
 from .friskby_sampler import FriskbySampler
@@ -27,12 +26,9 @@ except SerialException as err:
     sys.stderr.flush()
     from .mock_sds011 import SDS011
 
-
-from .service_config import ServiceConfig
 from .ts import TS
 
 __all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
-           'SDS011', 'ServiceConfig', 'TS', 'GitModule', 'DeviceConfig',
-           'sys_info']
+           'SDS011', 'TS', 'DeviceConfig', 'sys_info']
 
-__version__ = '0.62.0'
+__version__ = '0.63.0'
