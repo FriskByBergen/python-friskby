@@ -92,9 +92,9 @@ class DaoTest(TestCase):
         self.assertEqual(_fpath, sqlpath)
         t10 = gen_rand_ts(value=26.8)
         t25 = gen_rand_ts(value=19.90)
-        self.dao.persist_ts((t10, t25))
+        dao.persist_ts((t10, t25))
         # data: 2 elts of (id, value, sensor, timestamp, upl)
-        data = self.dao.get_non_uploaded()
+        data = dao.get_non_uploaded()
         self.assertEqual(2, len(data))
         db_10, db_25 = data
         if db_10[2] != 'PM10':
@@ -102,3 +102,27 @@ class DaoTest(TestCase):
 
         self.assertEqual(26.8, db_10[1])
         self.assertEqual(19.9, db_25[1])
+
+    def test_last_entry(self):
+        self.assertIsNone(self.dao.last_entry(uploaded=True))
+        self.assertIsNone(self.dao.last_entry(uploaded=False))
+        self.assertIsNone(self.dao.last_entry())
+
+        t10 = gen_rand_ts()
+        t25 = gen_rand_ts()
+        self.dao.persist_ts((t10, t25))
+        self.assertIsNone(self.dao.last_entry(uploaded=True))
+        self.assertIsNotNone(self.dao.last_entry(uploaded=False))
+        self.assertIsNotNone(self.dao.last_entry())
+        data = self.dao.get_non_uploaded(limit=30)
+        self.dao.mark_uploaded(data)
+        self.assertIsNotNone(self.dao.last_entry(uploaded=True))
+        self.assertIsNone(self.dao.last_entry(uploaded=False))
+        self.assertIsNotNone(self.dao.last_entry())
+        t10 = gen_rand_ts()
+        t25 = gen_rand_ts()
+        self.dao.persist_ts((t10, t25))
+        self.assertIsNotNone(self.dao.last_entry(uploaded=True))
+        self.assertIsNotNone(self.dao.last_entry(uploaded=False))
+        self.assertIsNotNone(self.dao.last_entry())
+        # could admittedly also test timestamp

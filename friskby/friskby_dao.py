@@ -96,6 +96,28 @@ class FriskbyDao(object):
         print('Persisted data.')
         sys.stdout.flush()
 
+
+    def last_entry(self, uploaded=None):
+        """Returns timestamp of the last entry in the dao, or None if no entry matches
+        the criterion.  If uploaded is non-None, then a truthy value will return the
+        last uploaded, and a falsy value will give the last non-uploaded entry.
+        """
+        query_pre = 'SELECT timestamp FROM samples'
+        query_mid = ' WHERE `uploaded` = %d' % (1 if uploaded else 0)
+        query_post = ' ORDER BY timestamp ASC LIMIT 1'
+        query = query_pre + query_post
+        return_value = None
+        if uploaded is not None:
+            query = query_pre + query_mid + query_post
+        conn = sqlite3.connect(self._sql_path)
+        result = conn.execute(query)
+        data = result.fetchall()
+        if data:
+            return_value = dt_parser.parse(data[0][0])
+        conn.close()
+        return return_value
+
+
     def mark_uploaded(self, data):
         print('dao marking ...')
         sys.stdout.flush()
