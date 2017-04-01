@@ -1,19 +1,47 @@
 from __future__ import print_function
 
 import sys
-from sys import stderr, argv
 from os import makedirs
 from os.path import abspath, isfile, isdir, split
 import sqlite3
 from datetime import datetime as dt
 from dateutil import parser as dt_parser
 
+
 def _insert(val, sensor):
     """Returns INSERT query"""
+    # TODO make this prepared statement
     query = "INSERT INTO samples (id, value, sensor, timestamp) VALUES (NULL, %f, '%s', '%s');"
     return query % (val, sensor, dt.utcnow())
 
+
 class FriskbyDao(object):
+    """The *FriskbyDao* is a data access object that currently persists measured
+    data to an SQLITE file using the `sqlite3` Python module.
+
+    The underlying database _scheme_ is simple:
+
+    ```sql
+    CREATE TABLE samples (
+        `id` INTEGER PRIMARY KEY,
+        `value` FLOAT NOT NULL,
+        `sensor` TEXT NOT NULL,
+        `timestamp` TEXT NOT NULL,
+        `uploaded` BOOL DEFAULT 0
+        );
+    ```
+
+    The `sensor` describes contains the sensor ID and describes what type of
+    measurement has been done.  The value is its value (in an assumed known (SI)
+    unit).  The `uploaded` flag signifies whether the measurement has been
+    uploaded
+
+    """
+    # TODO make FriskbyDao a context manager so we can:
+    # with FriskbyDao(path) as dao:
+    #    dao.get_non_uploaded(...)
+    #    submitter.post(...)
+    #    dao.mark_uploaded(...)
 
     def __init__(self, sql_path):
         """The sqlite db has a table called 'samples' with schema
@@ -67,35 +95,33 @@ class FriskbyDao(object):
     def get_non_uploaded(self, limit=100):
         sub_q = "id, value, sensor, datetime(timestamp, 'localtime'), uploaded"
         query = 'SELECT %s FROM samples WHERE NOT `uploaded` LIMIT %d;'
-        try:
-            conn = sqlite3.connect(self._sql_path)
-            result = conn.execute(query % (sub_q, limit))
-            data = result.fetchall()
-            conn.close()
-            print('dao fetched %d rows of non-uploaded data' % len(data))
-            sys.stdout.flush()
-            for i in range(len(data)):
-                id_, val_, sens_, dt_, upl_ = data[i]
-                data[i] = id_, val_, sens_, dt_parser.parse(dt_), upl_
-            return data
-        except Exception as err:
-            stderr.write('Error on reading data: %s.\n' % err)
+
+        conn = sqlite3.connect(self._sql_path)
+        result = conn.execute(query % (sub_q, limit))
+        data = result.fetchall()
+        conn.close()
+        print('dao fetched %d rows of non-uploaded data' % len(data))
+        sys.stdout.flush()
+        for i in range(len(data)):
+            id_, val_, sens_, dt_, upl_ = data[i]
+            data[i] = id_, val_, sens_, dt_parser.parse(dt_), upl_
+        return data
 
     def persist_ts(self, data):
-        ts_pm10, ts_pm25 = data
-        q10 = _insert(ts_pm10.median(), 'PM10')
-        q25 = _insert(ts_pm25.median(), 'PM25')
-        try:
-            conn = sqlite3.connect(self._sql_path)
-            conn.execute(q10)
-            conn.execute(q25)
-            conn.commit()
-            conn.close()
-        except Exception as err:
-            stderr.write('Error on persisting data: %s.\n' % err)
-        print('Persisted data.')
-        sys.stdout.flush()
+        """Save data to underlying storage.
 
+        Data should be on form {'PM10': TS, 'PM25': TS, ...}, where the TS are
+        timeseries, that is, they should have a median: TS->float function.
+
+        """
+        queries = []
+        for sensor, ts in data.items():
+            queries.append(_insert(ts.median(), sensor))
+        conn = sqlite3.connect(self._sql_path)
+        for query in queries:
+            conn.execute(query)
+        conn.commit()
+        conn.close()
 
     def last_entry(self, uploaded=None):
         """Returns timestamp of the last entry in the dao, or None if no entry matches
@@ -122,17 +148,15 @@ class FriskbyDao(object):
         print('dao marking ...')
         sys.stdout.flush()
         query = 'UPDATE samples SET uploaded=1 WHERE id=%s'
-        try:
-            conn = sqlite3.connect(self._sql_path)
-            conn.execute('begin')
-            for row in data:
-                # id, value, sensor, timestamp, uploaded
-                id_ = row[0]
-                conn.execute(query % id_)
-            conn.commit()
-            conn.close()
-        except Exception as err:
-            stderr.write('Error on setting UPLOADED data! %s.\n' % err)
+
+        conn = sqlite3.connect(self._sql_path)
+        conn.execute('begin')
+        for row in data:
+            # id, value, sensor, timestamp, uploaded
+            id_ = row[0]
+            conn.execute(query % id_)
+        conn.commit()
+        conn.close()
 
 
     def __repr__(self):
@@ -143,8 +167,9 @@ class FriskbyDao(object):
         except:
             return 'FriskbyDao(path=%s)' % (self._sql_path)
 
+
 if __name__ == '__main__':
-    if len(argv) > 1:
-        print(FriskbyDao(argv[1]))
+    if len(sys.argv) > 1:
+        print(FriskbyDao(sys.argv[1]))
     else:
         sys.exit('Need a path to an sqlite database.')

@@ -47,7 +47,8 @@ class DaoTest(TestCase):
         for _ in range(num_data):
             t10 = gen_rand_ts()
             t25 = gen_rand_ts()
-            self.dao.persist_ts((t10, t25))
+            data = {'PM10': t10, 'PM25': t25}
+            self.dao.persist_ts(data)
 
         self._do_test_num_upl(self.dao, 2*num_data, 0, 2*num_data)
 
@@ -59,7 +60,8 @@ class DaoTest(TestCase):
         for _ in range(num_data):
             t10 = gen_rand_ts()
             t25 = gen_rand_ts()
-            self.dao.persist_ts((t10, t25))
+            data = {'PM10': t10, 'PM25': t25}
+            self.dao.persist_ts(data)
         print(repr(self.dao))
 
         self._do_test_num_upl(self.dao, 2*num_data, 0, 2*num_data)
@@ -78,7 +80,8 @@ class DaoTest(TestCase):
         t10 = gen_rand_ts()
         t25 = gen_rand_ts()
         now = dt.now()
-        self.dao.persist_ts((t10, t25))
+        data = {'PM10': t10, 'PM25': t25}
+        self.dao.persist_ts(data)
         out = self.dao.get_non_uploaded(limit=1)[0]
         delta = now - out[3]
         # checking that we're in the same timezone
@@ -92,7 +95,8 @@ class DaoTest(TestCase):
         self.assertEqual(_fpath, sqlpath)
         t10 = gen_rand_ts(value=26.8)
         t25 = gen_rand_ts(value=19.90)
-        dao.persist_ts((t10, t25))
+        data = {'PM10': t10, 'PM25': t25}
+        dao.persist_ts(data)
         # data: 2 elts of (id, value, sensor, timestamp, upl)
         data = dao.get_non_uploaded()
         self.assertEqual(2, len(data))
@@ -110,7 +114,8 @@ class DaoTest(TestCase):
 
         t10 = gen_rand_ts()
         t25 = gen_rand_ts()
-        self.dao.persist_ts((t10, t25))
+        data = {'PM10': t10, 'PM25': t25}
+        self.dao.persist_ts(data)
         self.assertIsNone(self.dao.last_entry(uploaded=True))
         self.assertIsNotNone(self.dao.last_entry(uploaded=False))
         self.assertIsNotNone(self.dao.last_entry())
@@ -121,7 +126,8 @@ class DaoTest(TestCase):
         self.assertIsNotNone(self.dao.last_entry())
         t10 = gen_rand_ts()
         t25 = gen_rand_ts()
-        self.dao.persist_ts((t10, t25))
+        data = {'PM10': t10, 'PM25': t25}
+        self.dao.persist_ts(data)
         self.assertIsNotNone(self.dao.last_entry(uploaded=True))
         self.assertIsNotNone(self.dao.last_entry(uploaded=False))
         self.assertIsNotNone(self.dao.last_entry())

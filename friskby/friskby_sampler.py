@@ -42,4 +42,5 @@ class FriskbySampler(object):
             time.sleep(self.sleep_time)
         print('\tDone collecting, storing and returning.')
         sys.stdout.flush()
-        self.dao.persist_ts(data)
+        samples = {'PM10': data[0], 'PM25': data[1]}
+        self.dao.persist_ts(samples)
