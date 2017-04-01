@@ -8,7 +8,7 @@ class SDS011(object):
     """A class for reading PM10 and PM25 from the SDS011 sensor.'
 
     Takes as input the path to the device, e.g. 'dev/ttyUSB0' or
-    '/dev/tty/AMA0'.  Has one method, read, which reads for
+    '/dev/ttyAMA0'.  Has one method, read, which reads for
 
     """
     MSG_START = 170  # AAC0
