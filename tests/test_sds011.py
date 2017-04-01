@@ -1,17 +1,9 @@
 from unittest import TestCase, skipUnless, skipIf
-from friskby import SDS011
-
-have_SDS011 = not SDS011.is_mock()
+from friskby import MockSDS011
 
 class SDS011Test(TestCase):
 
-    @skipUnless(have_SDS011, "Must be on RPi with /dev/ttyUSB0 to run test")
-    def test_read(self):
-        _ = SDS011(True).read()
-
-
-    @skipIf(have_SDS011, "Test based on Mock SDS011")
     def test_read_mock(self):
-        pm10, pm25 = SDS011(True).read()
-        self.assertEqual(pm10, 10)
-        self.assertEqual(pm25, 25)
+        pm10, pm25 = MockSDS011('/device/sds011').read()
+        self.assertEqual(10.0, pm10)
+        self.assertEqual(2.5, pm25)

@@ -2,7 +2,7 @@ from tempfile import NamedTemporaryFile as temp
 from datetime import datetime as dt
 from unittest import TestCase
 
-from friskby import FriskbyDao, FriskbySampler, SDS011
+from friskby import FriskbyDao, FriskbySampler, MockSDS011
 
 class SamplerTest(TestCase):
 
@@ -17,8 +17,8 @@ class SamplerTest(TestCase):
         sleep_time = 0.10
 
         start = dt.now()
-        sampler = FriskbySampler(SDS011(True), self.dao, sample_time=sample_time,
-                                 sleep_time=sleep_time)
+        sampler = FriskbySampler(MockSDS011('/path/to/dev'), self.dao,
+                                 sample_time=sample_time, sleep_time=sleep_time)
         sampler.collect()
         stop = dt.now()
 

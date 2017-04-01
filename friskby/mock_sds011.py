@@ -1,11 +1,7 @@
-class SDS011(object):
+class MockSDS011(object):
 
-    def __init__(self, usb):
-        self.usb = usb
+    def __init__(self, device_url):
+        self.device_url = device_url
 
     def read(self):
-        return (10, 25)
-
-    @classmethod
-    def is_mock(cls):
-        return True
+        return (10.0, 2.5)
