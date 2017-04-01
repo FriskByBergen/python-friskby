@@ -7,6 +7,7 @@ import datetime
 import tempfile
 from urlparse import urlparse
 import requests
+import friskby
 
 class DeviceConfig(object):
     required_keys = ["post_key", "sensor_list", "post_path", "config_path",
@@ -33,7 +34,7 @@ class DeviceConfig(object):
         self.config_ts = datetime.datetime.now()
 
     def get_version(self):
-        return '0.0.0' # TODO fix
+        return friskby.VERSION
 
     def __eq__(self, other):
         return self.data == other.data

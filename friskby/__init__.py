@@ -10,13 +10,12 @@ from .friskby_sampler import FriskbySampler
 from .friskby_runner import FriskbyRunner
 from .friskby_submitter import FriskbySubmitter
 from .os_release import sys_info
-
-from .sds011 import SDS011
-from .mock_sds011 import MockSDS011
-
 from .ts import TS
 
-__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
-           'SDS011', 'TS', 'DeviceConfig', 'sys_info']
+from .sensors import SDS011
 
-__version__ = '0.64.0'
+VERSION = '0.64.0'
+__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
+           'TS', 'DeviceConfig', 'sys_info']
+
+__version__ = VERSION
