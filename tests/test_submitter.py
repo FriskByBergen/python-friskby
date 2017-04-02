@@ -1,12 +1,18 @@
-import tempfile
+from tempfile import NamedTemporaryFile as temp
 from unittest import TestCase
 from friskby import FriskbySubmitter, DeviceConfig
 
 class FriskbySubmitterTest(TestCase):
 
+    def _temp_fname(self, postfix=''):
+        tmpf = temp(delete=False)
+        fname = tmpf.name + postfix
+        tmpf.close()
+        return fname
+
     def setUp(self):
-        _, self.cfg_fname = tempfile.mkstemp()
-        _, self.sql_fname = tempfile.mkstemp()
+        self.sql_fname = self._temp_fname('_db.sql')
+        self.cfg_fname = self._temp_fname('_.cfg')
         url_ = "https://friskby.herokuapp.com/sensor/api/device/FriskPITest/"
         deviceconfig = DeviceConfig.download(url_, post_key="xxx")
         deviceconfig.save(filename=self.cfg_fname)
