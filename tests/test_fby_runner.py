@@ -4,17 +4,21 @@ import json
 from unittest import TestCase
 from random import randint
 
-from friskby import FriskbyRunner
+from friskby import FriskbyRunner, DeviceConfig
 
 
 class FriskbyRunnerTest(TestCase):
 
     def setUp(self):
-        self._tmp_f = '/tmp/%d' % randint(2**30, 2**32)
-        os.mkdir(self._tmp_f)
+        _tmp_f = '/tmp/%d' % randint(2**30, 2**32)
+        url_ = "https://friskby.herokuapp.com/sensor/api/device/FriskPITest/"
+        deviceconfig = DeviceConfig.download(url_, post_key="xxx")
+        deviceconfig.save(filename=_tmp_f)
+        self.cfg = deviceconfig
+
 
     def test_load(self):
-        _ = FriskbyRunner(var_path=self._tmp_f)
+        _ = FriskbyRunner(self.cfg)
 
     def test_sysinfo(self):
         sys_info = FriskbyRunner.get_sys_info()
