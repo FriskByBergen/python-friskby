@@ -124,7 +124,7 @@ class DeviceConfig(object):
 
     def postVersion(self):
         data = {"key"     : self.getPostKey(),
-                "git_ref" : "%s / %s" % self.get_version()}
+                "git_ref" : "%s" % self.get_version()}
         headers = {"Content-Type": "application/json"}
 
         requests.put("%s/sensor/api/device/%s/" %
