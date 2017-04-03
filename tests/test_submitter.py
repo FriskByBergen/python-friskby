@@ -1,6 +1,6 @@
 from tempfile import NamedTemporaryFile as temp
 from unittest import TestCase
-from friskby import FriskbySubmitter, DeviceConfig
+from friskby import FriskbyDao, FriskbySubmitter, DeviceConfig
 
 class FriskbySubmitterTest(TestCase):
 
@@ -11,12 +11,13 @@ class FriskbySubmitterTest(TestCase):
         return fname
 
     def setUp(self):
-        self.sql_fname = self._temp_fname('_db.sql')
-        self.cfg_fname = self._temp_fname('_.cfg')
+        self.dao = FriskbyDao(self._temp_fname('_db.sql'))
+        cfg_fname = self._temp_fname('_.cfg')
         url_ = "https://friskby.herokuapp.com/sensor/api/device/FriskPITest/"
         deviceconfig = DeviceConfig.download(url_, post_key="xxx")
-        deviceconfig.save(filename=self.cfg_fname)
+        deviceconfig.save(filename=cfg_fname)
+        self.cfg = deviceconfig
 
     def test_friskby_submitter(self):
-        subm = FriskbySubmitter(self.sql_fname, self.cfg_fname)
+        subm = FriskbySubmitter(self.dao, self.cfg)
         subm.post() # empty post should be noop

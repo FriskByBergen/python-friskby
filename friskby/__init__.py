@@ -71,7 +71,7 @@ from .ts import TS
 
 from .sensors import SDS011
 
-VERSION = '0.64.1'
+VERSION = '0.64.2'
 __all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
            'TS', 'DeviceConfig', 'sys_info']
 

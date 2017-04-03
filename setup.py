@@ -4,7 +4,7 @@ DEPENDENCIES = ['requests', 'pyserial', 'python-dateutil']
 
 setup(
     name='friskby',
-    version='0.64.1',
+    version='0.64.2',
     description='The friskby module',
     url='http://github.com/FriskbyBergen/python-friskby',
     author='Friskby Bergen',
