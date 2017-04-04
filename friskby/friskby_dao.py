@@ -130,7 +130,7 @@ class FriskbyDao(object):
         """
         query_pre = 'SELECT timestamp FROM samples'
         query_mid = ' WHERE `uploaded` = %d' % (1 if uploaded else 0)
-        query_post = ' ORDER BY timestamp ASC LIMIT 1'
+        query_post = ' ORDER BY timestamp DESC LIMIT 1'
         query = query_pre + query_post
         return_value = None
         if uploaded is not None:

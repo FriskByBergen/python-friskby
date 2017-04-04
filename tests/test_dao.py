@@ -131,4 +131,4 @@ class DaoTest(TestCase):
         self.assertIsNotNone(self.dao.last_entry(uploaded=True))
         self.assertIsNotNone(self.dao.last_entry(uploaded=False))
         self.assertIsNotNone(self.dao.last_entry())
-        # could admittedly also test timestamp
+        # could admittedly also test timestamp, but is hard since dao timestamps
