@@ -69,9 +69,9 @@ the webserver is defined in a config file provided by the caller.  The submitter
 uses the `requests` module in Python (it is recommended that one has
 `requests>=2.13.0`, which is the latest one).
 
-### FriskbyRunner
+### FriskbyManager
 
-The job of the FriskbyRunner is to read the aforementioned config file, contact
+The job of the FriskbyManager is to read the aforementioned config file, contact
 the webserver and ask for today's news.  They are rare, but may contain
 reconfiguration of API keys, URL's and occasionally requests that the client
 updates itself.

@@ -49,9 +49,9 @@ the webserver is defined in a config file provided by the caller.  The submitter
 uses the `requests` module in Python (it is recommended that one has
 `requests>=2.13.0`, which is the latest one).
 
-# FriskbyRunner
+# FriskbyManager
 
-The job of the FriskbyRunner is to read the aforementioned config file, contact
+The job of the FriskbyManager is to read the aforementioned config file, contact
 the webserver and ask for today's news.  They are rare, but may contain
 reconfiguration of API keys, URL's and occasionally requests that the client
 updates itself.
@@ -64,15 +64,15 @@ from serial import SerialException
 from .device_config import DeviceConfig
 from .friskby_dao import FriskbyDao
 from .friskby_sampler import FriskbySampler
-from .friskby_runner import FriskbyRunner
+from .friskby_manager import FriskbyManager
 from .friskby_submitter import FriskbySubmitter
 from .os_release import sys_info
 from .ts import TS
 
 from .sensors import SDS011
 
-VERSION = '0.65.0'
-__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyRunner',
+VERSION = '0.65.1'
+__all__ = ['FriskbyDao', 'FriskbySampler', 'FriskbySubmitter', 'FriskbyManager',
            'TS', 'DeviceConfig', 'sys_info']
 
 __version__ = VERSION
