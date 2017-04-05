@@ -8,7 +8,7 @@ from traceback import format_exception
 
 from .os_release import sys_info
 
-class FriskbyRunner(object):
+class FriskbyManager(object):
 
     def __init__(self, device_config):
         self._config = device_config

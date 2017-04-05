@@ -4,10 +4,10 @@ import json
 from unittest import TestCase
 from random import randint
 
-from friskby import FriskbyRunner, DeviceConfig
+from friskby import FriskbyManager, DeviceConfig
 
 
-class FriskbyRunnerTest(TestCase):
+class FriskbyManagerTest(TestCase):
 
     def setUp(self):
         _tmp_f = '/tmp/%d' % randint(2**30, 2**32)
@@ -18,14 +18,14 @@ class FriskbyRunnerTest(TestCase):
 
 
     def test_load(self):
-        _ = FriskbyRunner(self.cfg)
+        _ = FriskbyManager(self.cfg)
 
     def test_sysinfo(self):
-        sys_info = FriskbyRunner.get_sys_info()
+        sys_info = FriskbyManager.get_sys_info()
         self.assertTrue('sysname'  in sys_info)
         self.assertTrue('requests' in sys_info)
         self.assertTrue('python'   in sys_info)
 
-        sys_info = FriskbyRunner.get_sys_info()
+        sys_info = FriskbyManager.get_sys_info()
         sys_info = json.dumps(sys_info, indent=4, sort_keys=True)
         print(sys_info)
