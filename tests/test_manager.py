@@ -19,16 +19,14 @@ class FakePip():
 
 class FakeDeviceConfig():
 
-    def __init__(self, channel=None):
-        self.channel = channel
+    def __init__(self, config=dict()):
+        self.config = config
 
     def downloadNew(self):
         return self
 
     def getChannel(self):
-        if self.channel is None:
-            raise KeyError("no channel")
-        return self.channel
+        return self.config["channel"]
 
 
 class FriskbyManagerTest(TestCase):
@@ -44,7 +42,7 @@ class FriskbyManagerTest(TestCase):
         print(sys_info)
 
     def test_nominal_and_stable_update(self):
-        cfg = FakeDeviceConfig(channel="stable")
+        cfg = FakeDeviceConfig({"channel": "stable"})
         pip = FakePip(code=0)
 
         manager = FriskbyManager(cfg, pip=pip, managed_packages=["package1"])
@@ -53,7 +51,7 @@ class FriskbyManagerTest(TestCase):
         self.assertEqual(pip.args, ["install", "--upgrade", "package1"])
 
     def test_failed_stable_update(self):
-        cfg = FakeDeviceConfig(channel="stable")
+        cfg = FakeDeviceConfig({"channel": "stable"})
         pip = FakePip(code=255)
 
         manager = FriskbyManager(cfg, pip=pip, managed_packages=["package1"])
@@ -62,7 +60,7 @@ class FriskbyManagerTest(TestCase):
             manager.update_client(cfg)
 
     def test_nominal_lastes_update(self):
-        cfg = FakeDeviceConfig(channel="latest")
+        cfg = FakeDeviceConfig({"channel": "latest"})
         pip = FakePip(code=0)
 
         manager = FriskbyManager(cfg, pip=pip, managed_packages=["package1"])

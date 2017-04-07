@@ -23,7 +23,7 @@ class FriskbyManager(object):
         units it manages.
 
         managed_packages is a list of pip packages that it will upgrade
-            (according to user preference).
+            (according to the config's channel value).
         managed_services is a list of systemd services.
         """
         self._config = device_config
@@ -85,16 +85,15 @@ class FriskbyManager(object):
 
         new_config = config.downloadNew()
 
-        update_mode = 'stable'
+        channel = 'stable'
         try:
-            update_mode = new_config.getChannel()
+            channel = new_config.getChannel()
         except KeyError:
             pass  # No channel defined, use stable.
 
         args = ["install", "--upgrade"]
-        if update_mode == 'latest':
+        if channel == 'latest':
             args.append("--pre")
-
         args.append(" ".join(self._managed_packages))
 
         ret = self._pip.main(args=args)
