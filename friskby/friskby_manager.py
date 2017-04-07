@@ -5,7 +5,6 @@ import json
 import sys
 
 from .os_release import sys_info
-from time import sleep
 
 
 SYSTEMD_NAME = 'org.freedesktop.systemd1'
@@ -20,7 +19,7 @@ class FriskbyManager(object):
     def __init__(self, device_config, dbus=None, pip=None,
                  managed_packages=None, managed_services=None):
         """Creates a Friskby manager. Given a config, the manager will upgrade
-        the client's pip packages, and appropriately reload/restart any systemd
+        the client's pip packages, and appropriately reload any systemd
         units it manages.
 
         managed_packages is a list of pip packages that it will upgrade
@@ -36,7 +35,7 @@ class FriskbyManager(object):
     def __run_post_install(self):
         """
         Checks if any known service needs a daemon-reload. If a service needs
-        it, we do a daemon-reload, wait, then restart each service.
+        it, we do a daemon-reload.
         """
         if self._dbus is None:
             print("No DBus provided, post-install can't run.")
@@ -52,27 +51,17 @@ class FriskbyManager(object):
         systemd1_obj = sysbus.get_object(SYSTEMD_NAME, SYSTEMD_OBJ)
         manager = self._dbus.Interface(systemd1_obj, SYSTEMD_MANAGER_IFACE)
 
-        restart_units = []
         for unit in self._managed_services:
             unit_obj_path = manager.GetUnit(unit)
             unit_obj = sysbus.get_object(SYSTEMD_NAME, unit_obj_path)
-            unit_proxy = self._dbus.Interface(unit_obj, SYSTEMD_UNIT_IFACE)
             props_proxy = self._dbus.Interface(unit_obj, DBUS_PROPERTIES_IFACE)
             need_reload = props_proxy.Get(SYSTEMD_UNIT_IFACE,
                                           'NeedDaemonReload')
             if need_reload:
-                restart_units.append(unit_proxy)
                 print("Unit %s required daemon-reload." % unit)
                 sys.stdout.flush()
-
-        # TODO: instead of sleeping, we could track the job and wait for it
-        # to finish.
-        if len(restart_units) > 0:
-            manager.Reload()
-            sleep(5)
-
-        for u in restart_units:
-            u.Restart('replace')
+                manager.Reload()
+                break
 
     def install(self, config):
         # TODO should we do pip install --upgrade reuirements from config?
