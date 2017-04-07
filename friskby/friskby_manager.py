@@ -73,6 +73,10 @@ class FriskbyManager(object):
         config.save()
 
     def update_client(self, config):
+        """Updates or upgrades the client's pip packages.
+
+        Raises RuntimeError should pip return a non-zero exit code.
+        """
         if self._pip is None:
             print("No pip provided, post install can't run.")
             sys.stdout.flush()
