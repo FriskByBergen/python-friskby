@@ -11,6 +11,7 @@ from time import sleep
 SYSTEMD_NAME = 'org.freedesktop.systemd1'
 SYSTEMD_OBJ = '/org/freedesktop/systemd1'
 SYSTEMD_UNIT_IFACE = 'org.freedesktop.systemd1.Unit'
+DBUS_PROPERTIES_IFACE = 'org.freedesktop.DBus.Properties'
 SYSTEMD_MANAGER_IFACE = 'org.freedesktop.systemd1.Manager'
 
 
@@ -56,8 +57,13 @@ class FriskbyManager(object):
             unit_obj_path = manager.GetUnit(unit)
             unit_obj = sysbus.get_object(SYSTEMD_NAME, unit_obj_path)
             unit_proxy = self._dbus.Interface(unit_obj, SYSTEMD_UNIT_IFACE)
-            if unit_proxy.NeedDaemonReload:
+            props_proxy = self._dbus.Interface(unit_obj, DBUS_PROPERTIES_IFACE)
+            need_reload = props_proxy.Get(SYSTEMD_UNIT_IFACE,
+                                          'NeedDaemonReload')
+            if need_reload:
                 restart_units.append(unit_proxy)
+                print("Unit %s required daemon-reload." % unit)
+                sys.stdout.flush()
 
         # TODO: instead of sleeping, we could track the job and wait for it
         # to finish.
@@ -98,7 +104,7 @@ class FriskbyManager(object):
         args = ["install", "--upgrade"]
         if channel == 'latest':
             args.append("--pre")
-        args.append(" ".join(self._managed_packages))
+        args = args + self._managed_packages
 
         ret = self._pip.main(args=args)
         if ret == 0:
