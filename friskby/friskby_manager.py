@@ -68,12 +68,15 @@ class FriskbyManager(object):
                                           "NeedDaemonReload")
             active_state = props_proxy.Get(SYSTEMD_UNIT_IFACE,
                                            "ActiveState")
+            names = props_proxy.Get(SYSTEMD_UNIT_IFACE,
+                                    "Names")
             if need_reload:
                 print("Unit %s required daemon-reload." % unit)
                 sys.stdout.flush()
                 needs_daemon_reload.append(unit)
 
-            if active_state == "active":
+            # Queue units to be restarted if active, but is not this service.
+            if active_state == "active" and "friskby.service" not in names:
                 print("Unit %s was active and will be restarted." % unit)
                 sys.stdout.flush()
                 units_to_be_restarted.append(unit_proxy)
