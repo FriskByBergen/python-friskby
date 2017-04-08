@@ -3,15 +3,16 @@ from __future__ import (print_function, absolute_import)
 
 import json
 import sys
+import time
 
 from .os_release import sys_info
 
 
-SYSTEMD_NAME = 'org.freedesktop.systemd1'
-SYSTEMD_OBJ = '/org/freedesktop/systemd1'
-SYSTEMD_UNIT_IFACE = 'org.freedesktop.systemd1.Unit'
-DBUS_PROPERTIES_IFACE = 'org.freedesktop.DBus.Properties'
-SYSTEMD_MANAGER_IFACE = 'org.freedesktop.systemd1.Manager'
+SYSTEMD_NAME = "org.freedesktop.systemd1"
+SYSTEMD_OBJ = "/org/freedesktop/systemd1"
+SYSTEMD_UNIT_IFACE = "org.freedesktop.systemd1.Unit"
+DBUS_PROPERTIES_IFACE = "org.freedesktop.DBus.Properties"
+SYSTEMD_MANAGER_IFACE = "org.freedesktop.systemd1.Manager"
 
 
 class FriskbyManager(object):
@@ -51,17 +52,40 @@ class FriskbyManager(object):
         systemd1_obj = sysbus.get_object(SYSTEMD_NAME, SYSTEMD_OBJ)
         manager = self._dbus.Interface(systemd1_obj, SYSTEMD_MANAGER_IFACE)
 
+        needs_daemon_reload = []
+        units_to_be_restarted = []
+
         for unit in self._managed_services:
             unit_obj_path = manager.GetUnit(unit)
             unit_obj = sysbus.get_object(SYSTEMD_NAME, unit_obj_path)
+
+            # Creates two unit proxies, one for issuing commands, and another
+            # for retrieving properties.
             props_proxy = self._dbus.Interface(unit_obj, DBUS_PROPERTIES_IFACE)
+            unit_proxy = self._dbus.Interface(unit_obj, SYSTEMD_UNIT_IFACE)
+
             need_reload = props_proxy.Get(SYSTEMD_UNIT_IFACE,
-                                          'NeedDaemonReload')
+                                          "NeedDaemonReload")
+            active_state = props_proxy.Get(SYSTEMD_UNIT_IFACE,
+                                           "ActiveState")
             if need_reload:
                 print("Unit %s required daemon-reload." % unit)
                 sys.stdout.flush()
-                manager.Reload()
-                break
+                needs_daemon_reload.append(unit)
+
+            if active_state == "active":
+                print("Unit %s was active and will be restarted." % unit)
+                sys.stdout.flush()
+                units_to_be_restarted.append(unit_proxy)
+
+        # TODO: Instead of sleeping, we could track the job and wait for its
+        # completion.
+        if len(needs_daemon_reload) > 0:
+            manager.Reload()
+            time.sleep(5)
+
+        for up in units_to_be_restarted:
+            up.Restart("replace")
 
     def install(self, config):
         # TODO should we do pip install --upgrade reuirements from config?
@@ -84,14 +108,14 @@ class FriskbyManager(object):
 
         new_config = config.downloadNew()
 
-        channel = 'stable'
+        channel = "stable"
         try:
             channel = new_config.getChannel()
         except KeyError:
             pass  # No channel defined, use stable.
 
         args = ["install", "--upgrade"]
-        if channel == 'latest':
+        if channel == "latest":
             args.append("--pre")
         args = args + self._managed_packages
 
