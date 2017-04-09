@@ -1,11 +1,17 @@
 language: python
 env:
   global:
-    - ISTRAVIS=True
-    - PYTHONPATH=.
+  - ISTRAVIS=True
+  - PYTHONPATH=.
 python:
-  - "2.7"
+- '2.7'
 install:
-  - pip install -r requirements.txt
+- pip install -r requirements.txt
 script:
-  - tests/run_tests
+- tests/run_tests
+deploy:
+  provider: pypi
+  user: "friskby"
+  password:
+    secure: kJRF+ybEPImmjSzd9iT6H4waVfQKw9lNYEUKQ7INZk2E5GiCXt8+LRD/jGnxyJIWwlk1bJWdZkde9V4/ntUGKXNoAv5yA0m0F/4DyFKs/xjxtkOnoI4cgyXA56I7cGIvjLsgf9+7WOUY47Oz0oknpZT/8sZb9UgA3UWdbuHgw6FeSx95aswWPuOiTorXn4C1NHimXxgApCIP5AcUz7G+8nA0KpuxYWcpTCxIG/q96++l6RjHddoeBFJK7uTycx/QM8RSplvV9wTWzvRZcNmx95Oq4zcQqp9Nuwefu0SvQzpRiitkiS2thNcIRdM9iFWTlP8VwTV9b2gENVYP33CB5YZ6E6/5ETOMAxMxfrw3K5p7A+M6dwNWr7P0m/cQElWaJXKaFnEYBDbj+tBrsNCydOYtCxEJabqtkDZgGgFpN0KbapbnaL1xaKd+oEt2xFbj9FlQLwTXVohJh5zVKMkHvO5p7gHioDQ0YH8lpjcbI/t78xG7MGTNL9t1CvHOy2E2uCxqYT6xyLccI3nDD6bHy9J6MoaGinP8bORXm9j24+/bDtOq2xbFz6Km8GPI5E/ZBTFI94MOeH7Uw4wuqd9AbdazNA/fd58fjRJTrYtUmzjePh75GgVADHyJZ4d9QSHO91hD6oG4xe8/Ezwcuc20M4mHDKpBkMaa240X5tI4IJs=
+  distributions: "sdist bdist_wheel"
