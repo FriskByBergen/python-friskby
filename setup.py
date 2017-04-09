@@ -1,10 +1,10 @@
 from setuptools import setup
 
-DEPENDENCIES = ['requests', 'pyserial', 'python-dateutil']
+DEPENDENCIES = ['requests', 'pyserial', 'python-dateutil', 'pip']
 
 setup(
     name='friskby',
-    version='0.65.1',
+    version='0.66.0',
     description='The friskby module',
     url='http://github.com/FriskbyBergen/python-friskby',
     author='Friskby Bergen',

@@ -53,7 +53,6 @@ class DeviceConfig(object):
         with open(filename, "w") as fileH:
             fileH.write(json.dumps(self.data))
 
-
     def getServerURL(self):
         return self.data["server_url"]
 
@@ -76,8 +75,11 @@ class DeviceConfig(object):
     def getPostKey(self):
         return self.data["post_key"]
 
+    def getChannel(self):
+        return self.data["channel"]
+
     def updateRequired(self, new_config):
-        return True # TODO add logic
+        return True  # TODO add logic
 
     def downloadNew(self):
         self.config_ts = datetime.datetime.now()
