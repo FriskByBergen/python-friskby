@@ -1,45 +1,46 @@
-from os import listdir
-from os.path import isfile, join
-import sys
-from unittest import TestCase, skipUnless
-import subprocess
+# -*- coding: utf-8 -*-
+"""
+    (c) 2017 FriskbyBergen.
 
-retcall = subprocess.call(["which", "pylint"]) # which returns 1 if no pylint
-HAVE_PYLINT = True
-if retcall != 0:
-    msg = '\n\n** Warning: Could not find pylint. Static checks skipped!\n\n'
-    sys.stderr.write(msg)
-    HAVE_PYLINT = False
+    Licence
+    =======
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-class PylintTest(TestCase):
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-    def _is_python_file(self, path, fname):
-        fpath = join(path, fname)
-        if not isfile(fpath):
-            return False
-        if fname[-3:] == '.py':
-            return True
-        if fname[:4] == 'fby_':
-            return True
-        if fname == 'run_tests':
-            return True
-        return False
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+"""
 
-    def _do_test_files(self, path):
-        """pylint -E on all .py files in path"""
-        for fname in listdir(path):
-            if len(fname) > 2 and self._is_python_file(path, fname):
-                fpath = join(path, fname)
-                print('Linting %s.' % fpath)
-                retcode = subprocess.call(["pylint", "--rcfile=tests/pylintrc",
-                                           fpath])
-                self.assertEqual(0, retcode,
-                                 msg='linting required for %s' % fpath)
+import fnmatch
+import os
+import unittest
+from pylint import epylint as lint
 
-    @skipUnless(HAVE_PYLINT, "Must have pylint executable installed")
-    def test_library(self):
-        self._do_test_files('friskby/')
 
-    @skipUnless(HAVE_PYLINT, "Must have pylint executable installed")
-    def test_tests_meta(self):
-        self._do_test_files('tests/')
+class CodeTestCase(unittest.TestCase):
+
+    def _get_lintable_files(self, paths):
+        """Recursively traverses all folders in paths for *.py files"""
+        matches = []
+        for folder in paths:
+            for root, _, filenames in os.walk(folder):
+                for filename in fnmatch.filter(filenames, '*.py'):
+                    matches.append(os.path.join(root, filename))
+        return matches
+
+    def test_linting(self):
+        paths = ['friskby', 'tests']
+        files = self._get_lintable_files(paths)
+        for f in files:
+            self.assertEqual(0, lint.lint(f), 'Linting required for %s' % f)
+
+
+if __name__ == '__main__':
+    unittest.main()

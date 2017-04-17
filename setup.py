@@ -4,7 +4,7 @@ DEPENDENCIES = ['requests', 'pyserial', 'python-dateutil', 'pip']
 
 setup(
     name='friskby',
-    version='0.67.0',
+    version='0.71.0',
     description='The friskby module',
     url='http://github.com/FriskbyBergen/python-friskby',
     author='Friskby Bergen',
@@ -14,5 +14,7 @@ setup(
     packages=['friskby', 'friskby/sensors'],
     zip_safe=False,
     setup_requires=DEPENDENCIES,
-    install_requires=DEPENDENCIES
+    install_requires=DEPENDENCIES,
+    tests_require=['pylint'],
+    test_suite='tests',
 )
