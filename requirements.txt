@@ -1,4 +1,0 @@
-requests
-pyserial
-pylint
-python-dateutil
