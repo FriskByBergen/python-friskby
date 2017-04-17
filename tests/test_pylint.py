@@ -26,19 +26,18 @@ from pylint import epylint as lint
 
 class CodeTestCase(unittest.TestCase):
 
-    def _get_lintable_files(self, folder):
-        """Recursively traverses folder for *.py files"""
+    def _get_lintable_files(self, paths):
+        """Recursively traverses all folders in paths for *.py files"""
         matches = []
-        for root, _, filenames in os.walk(folder):
-            for filename in fnmatch.filter(filenames, '*.py'):
-                matches.append(os.path.join(root, filename))
+        for folder in paths:
+            for root, _, filenames in os.walk(folder):
+                for filename in fnmatch.filter(filenames, '*.py'):
+                    matches.append(os.path.join(root, filename))
         return matches
 
     def test_linting(self):
         paths = ['friskby', 'tests']
-        files = []
-        for path in paths:
-            files += self._get_lintable_files(path)
+        files = self._get_lintable_files(paths)
         for f in files:
             self.assertEqual(0, lint.lint(f), 'Linting required for %s' % f)
 
