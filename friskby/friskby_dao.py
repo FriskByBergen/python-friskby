@@ -92,20 +92,32 @@ class FriskbyDao(object):
         return num
 
 
-    def get_non_uploaded(self, limit=100):
+    def get_recent_samples(self, limit=20, uploaded=None):
+        """If uploaded=True, get uploaded, if uploaded=False, get non-uploaded.  If
+        uploaded=None, ignore upload status.
+
+        """
+
         sub_q = "id, value, sensor, datetime(timestamp, 'localtime'), uploaded"
-        query = 'SELECT %s FROM samples WHERE NOT `uploaded` LIMIT %d;'
+        query = 'SELECT %s FROM samples %s LIMIT %d;'
+        upl_q = ''
+        if uploaded is True:
+            upl_q = 'WHERE `uploaded`'
+        if uploaded is False:
+            upl_q = 'WHERE NOT `uploaded`'
 
         conn = sqlite3.connect(self._sql_path)
-        result = conn.execute(query % (sub_q, limit))
+        result = conn.execute(query % (sub_q, upl_q, limit))
         data = result.fetchall()
         conn.close()
-        print('dao fetched %d rows of non-uploaded data' % len(data))
-        sys.stdout.flush()
         for i in range(len(data)):
             id_, val_, sens_, dt_, upl_ = data[i]
             data[i] = id_, val_, sens_, dt_parser.parse(dt_), upl_
         return data
+
+
+    def get_non_uploaded(self, limit=20):
+        return self.get_recent_samples(limit=limit, uploaded=False)
 
     def persist_ts(self, data):
         """Save data to underlying storage.
