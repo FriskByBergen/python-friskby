@@ -66,12 +66,27 @@ class DaoTest(TestCase):
 
         self._do_test_num_upl(self.dao, 2*num_data, 0, 2*num_data)
 
+        data = self.dao.get_recent_samples(limit=30, uploaded=True)
+        self.assertEqual(0, len(data))
+        data = self.dao.get_recent_samples(limit=30, uploaded=None)
+        self.assertEqual(30, len(data))
+        data = self.dao.get_recent_samples(limit=30, uploaded=False)
+        self.assertEqual(30, len(data))
+
         data = self.dao.get_non_uploaded(limit=30)
         self.assertEqual(30, len(data))
         self.dao.mark_uploaded(data)
         data = self.dao.get_non_uploaded(limit=30)
         self.assertEqual(4, len(data)) # total 34, marked 30
+        data = self.dao.get_recent_samples(limit=30, uploaded=False)
+        self.assertEqual(4, len(data))
+        data = self.dao.get_recent_samples(limit=30, uploaded=True)
+        self.assertEqual(30, len(data))
+        data = self.dao.get_recent_samples(limit=40, uploaded=None)
+        self.assertEqual(34, len(data))
+
         print(repr(self.dao))
+        self.assertTrue(repr(self.dao).startswith('FriskbyDao'))
 
         # test num / num upl / num non-upl
         self._do_test_num_upl(self.dao, 2*num_data, 30, 2*num_data - 30)
