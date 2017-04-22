@@ -99,7 +99,7 @@ class FriskbyDao(object):
         """
 
         sub_q = "id, value, sensor, datetime(timestamp, 'localtime'), uploaded"
-        query = 'SELECT %s FROM samples %s LIMIT %d;'
+        query = 'SELECT %s FROM samples %s ORDER BY id DESC LIMIT %d;'
         upl_q = ''
         if uploaded is True:
             upl_q = 'WHERE `uploaded`'
