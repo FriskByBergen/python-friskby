@@ -55,6 +55,45 @@ class DaoTest(TestCase):
         data = self.dao.get_non_uploaded(limit=30)
         self.assertEqual(2*num_data, len(data))
 
+    def _help_test_recent_samples(self, data, idx, upl):
+        """Test that data has values idx+0.1 and idx+0.25 and correct upl stat"""
+        err_val = 'Sample should be %d.1 or %d.025, was %.3f'
+        d0, d1 = data[0], data[1]
+        err_upl = 'Wrong upload status, should have been %s'
+
+        self.assertTrue(idx < d0[1] < 1+idx, msg=err_val % (idx, idx+1, d0[1]))
+        self.assertTrue(idx < d1[1] < 1+idx, msg=err_val % (idx, idx+1, d1[1]))
+        self.assertEqual(d0[4], upl, msg=err_upl % upl)
+        self.assertEqual(d1[4], upl, msg=err_upl % upl)
+
+
+    def test_recent_samples(self):
+        num_data = 17
+        for i in range(num_data):
+            t10 = gen_rand_ts(value=i + 0.100)
+            t25 = gen_rand_ts(value=i + 0.025)
+            data = {'PM10': t10, 'PM25': t25}
+            self.dao.persist_ts(data)
+
+        # dao has values [..., 14.1, 14.025, 15.1, 15.025, 16.1, 16.025]
+        idx = 16
+        data = self.dao.get_recent_samples(limit=2)
+        self._help_test_recent_samples(data, idx, False)
+        self.dao.mark_uploaded(data)
+        data = self.dao.get_recent_samples(limit=2)
+        self._help_test_recent_samples(data, idx, True)
+        data = self.dao.get_recent_samples(limit=2, uploaded=True)
+        self._help_test_recent_samples(data, idx, True)
+        idx = 15
+        data = self.dao.get_recent_samples(limit=2, uploaded=False)
+        self._help_test_recent_samples(data, idx, False)
+        self.dao.mark_uploaded(data)
+        idx = 14
+        data = self.dao.get_recent_samples(limit=2, uploaded=False)
+        self._help_test_recent_samples(data, idx, False)
+
+
+
     def test_mark_uploaded(self):
         num_data = 17
         for _ in range(num_data):
